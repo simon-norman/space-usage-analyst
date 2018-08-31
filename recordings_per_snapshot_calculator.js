@@ -46,7 +46,7 @@ module.exports = () => stampit({
       }
     },
 
-    getRecordingsPerSnapshot() {
+    getNoOfRecordingsPerSnapshot() {
       return Array.from(this.mapOfSnapshotTimesToRecordingsCount.values());
     },
 

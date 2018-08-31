@@ -50,7 +50,7 @@ describe('recordings_per_snapshot_calculator', function () {
     recordingsPerSnapshotCalculator.countRecordingInSnapshot(mockRecordings[0]);
     recordingsPerSnapshotCalculator.countRecordingInSnapshot(mockRecordings[1]);
     const countOfRecordingsPerSnapshot = recordingsPerSnapshotCalculator
-      .getRecordingsPerSnapshot();
+      .getNoOfRecordingsPerSnapshot();
 
     expect(countOfRecordingsPerSnapshot).to.deep.equal([1, 1, 0, 0]);
   });
