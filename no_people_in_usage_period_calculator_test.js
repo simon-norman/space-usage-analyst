@@ -47,10 +47,8 @@ describe('no_people_in_usage_period_calculator', function () {
   });
 
   it('should count recording against its snapshot time and return, when requested, the count of recordings for each time', function () {
-    noPeopleInUsagePeriodCalculator.addRecordingToCalculation(mockRecordings[0]);
-    noPeopleInUsagePeriodCalculator.addRecordingToCalculation(mockRecordings[1]);
     const noOfPeopleInUsagePeriod = noPeopleInUsagePeriodCalculator
-      .getNoOfPeopleInUsagePeriod();
+      .calculateNoOfPeopleInUsagePeriod(mockRecordings);
 
     expect(noOfPeopleInUsagePeriod).to.equal(1);
   });

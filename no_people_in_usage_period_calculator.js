@@ -67,7 +67,11 @@ module.exports = () => stampit({
       return this.usagePeriodStartTime + (indexOfSnapshot * this.snapshotLengthInMilliseconds);
     },
 
-    getNoOfPeopleInUsagePeriod() {
+    calculateNoOfPeopleInUsagePeriod(recordings) {
+      for (const recording of recordings) {
+        this.addRecordingToCalculation(recording);
+      }
+
       const arrayOfRecordingCountsForPeriod
         = Array.from(this.mapOfSnapshotTimesToRecordingsCount.values());
 
