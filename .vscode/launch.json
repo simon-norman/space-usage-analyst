@@ -21,7 +21,7 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "Recordings per snapshot calculator test",
+        "name": "Number of people in usage period calculator test",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
             "-u",
@@ -29,7 +29,7 @@
             "--timeout",
             "999999",
             "--colors",
-            "./{,!(node_modules)/**/}*recordings_per_snapshot_calculator_test.js"
+            "./{,!(node_modules)/**/}*no_people_in_usage_period_calculator_test.js"
         ],
         "internalConsoleOptions": "openOnSessionStart"
     },

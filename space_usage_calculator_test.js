@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const SpaceUsageCalculatorStampFactory = require('./space_usage_calculator_test');
+const RecordingsPerSnapshotCalculatorStampFactory = require('./space_usage_calculator_test');
 
 
 describe('people_per_period_calculator', function () {

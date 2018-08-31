@@ -1,7 +1,6 @@
 const stampit = require('stampit');
-const math = require('mathjs');
 
-module.exports = RecordingsPerSnapshotCalculatorStamp => stampit({
+module.exports = NoPeopleInUsagePeriodCalculatorStamp => stampit({
   methods: {
     calculateSpaceUsage({
       recordings,
@@ -11,72 +10,68 @@ module.exports = RecordingsPerSnapshotCalculatorStamp => stampit({
       this.usagePeriodStartTimestamp = usagePeriodStartTimestamp;
       this.usagePeriodEndTimestamp = usagePeriodEndTimestamp;
 
-      this.sortRecordingsIntoSpaceSnapshots(recordings);
+      this.addRecordingsToUsagePeriodCalculations(recordings);
 
       this.calculateSpaceUsageForEachSpace();
 
       return this.spaceUsage;
     },
 
-    sortRecordingsIntoSpaceSnapshots(recordings) {
+    addRecordingsToUsagePeriodCalculations(recordings) {
       for (const recording of recordings) {
-        this.noteWhichSpaceSnapshotsRecordingIsIn(recording);
+        this.addRecordingToUsagePeriodCalculationForEachSpace(recording);
       }
     },
 
-    noteWhichSpaceSnapshotsRecordingIsIn(recording) {
+    addRecordingToUsagePeriodCalculationForEachSpace(recording) {
       for (const recordingSpaceId of recording.spaceIds) {
-        const recordingPerSnapshotCalculator
-          = this.getOrCreateRecordingPerSnapshotCalculator(recordingSpaceId);
+        const noPeopleInUsagePeriodCalculator
+          = this.getOrCreateNoPeopleInUsagePeriodCalculator(recordingSpaceId);
 
-        recordingPerSnapshotCalculator.countRecordingInSnapshot();
+        noPeopleInUsagePeriodCalculator.addRecordingToCalculation();
       }
     },
 
-    getOrCreateRecordingPerSnapshotCalculator(recordingSpaceId) {
-      const recordingPerSnapshotCalculator
-        = this.mapOfSpacesToRecordingsPerSnapshotCalculators.get(recordingSpaceId);
+    getOrCreateNoPeopleInUsagePeriodCalculator(recordingSpaceId) {
+      const noPeopleInUsagePeriodCalculator
+        = this.mapOfSpacesToNoPeopleInUsagePeriodCalculators.get(recordingSpaceId);
 
-      if (recordingPerSnapshotCalculator) {
-        return recordingPerSnapshotCalculator;
+      if (noPeopleInUsagePeriodCalculator) {
+        return noPeopleInUsagePeriodCalculator;
       }
 
-      return this.createRecordingPerSnapshotCalculator(recordingSpaceId);
+      return this.createNoPeopleInUsagePeriodCalculator(recordingSpaceId);
     },
 
-    createRecordingPerSnapshotCalculator(recordingSpaceId) {
-      const recordingPerSnapshotCalculator
-        = RecordingsPerSnapshotCalculatorStamp({
-          snapshotsStartTime: this.usagePeriodStartTimestamp,
-          snapshotsEndTime: this.usagePeriodEndTimestamp,
+    createNoPeopleInUsagePeriodCalculator(recordingSpaceId) {
+      const noPeopleInUsagePeriodCalculator
+        = NoPeopleInUsagePeriodCalculatorStamp({
+          usagePeriodStartTimestamp: this.usagePeriodStartTimestamp,
+          usagePeriodEndTimestamp: this.usagePeriodEndTimestamp,
           snapshotLengthInMilliseconds: 5000,
         });
 
-      this.mapOfSpacesToRecordingsPerSnapshotCalculators
-        .set(recordingSpaceId, recordingPerSnapshotCalculator);
+      this.mapOfSpacesToNoPeopleInUsagePeriodCalculators
+        .set(recordingSpaceId, noPeopleInUsagePeriodCalculator);
 
-      return recordingPerSnapshotCalculator;
+      return noPeopleInUsagePeriodCalculator;
     },
 
     calculateSpaceUsageForEachSpace() {
-      this.mapOfSpacesToRecordingsPerSnapshotCalculators
-        .forEach((spaceId, recordingPerSnapshotCalculator) => {
-          this.calculateSpaceUsageForASpace(spaceId, recordingPerSnapshotCalculator);
+      this.mapOfSpacesToNoPeopleInUsagePeriodCalculators
+        .forEach((spaceId, noPeopleInUsagePeriodCalculator) => {
+          this.calculateSpaceUsageForASpace(spaceId, noPeopleInUsagePeriodCalculator);
         });
     },
 
-    calculateSpaceUsageForASpace(spaceId, recordingPerSnapshotCalculator) {
-      const noOfRecordingsPerSnapshot
-        = recordingPerSnapshotCalculator.getNoOfRecordingsPerSnapshot();
-
-      const medianNumberOfRecordingsInUsagePeriodRoundedUp
-        = math.ceil(math.median(noOfRecordingsPerSnapshot));
+    calculateSpaceUsageForASpace(spaceId, noPeopleInUsagePeriodCalculator) {
+      const numberOfPeopleRecorded = noPeopleInUsagePeriodCalculator.getNoOfPeopleInUsagePeriod();
 
       this.spaceUsage.push({
         spaceId,
         usagePeriodStartTimestamp: this.usagePeriodStartTimestamp,
         usagePeriodEndTimestamp: this.usagePeriodEndTimestamp,
-        numberOfPeopleRecorded: medianNumberOfRecordingsInUsagePeriodRoundedUp,
+        numberOfPeopleRecorded,
       });
     },
   },
