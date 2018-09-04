@@ -9,9 +9,9 @@ describe('space', () => {
   let mockSpaceUsage;
 
   const ensureSpaceUsageCollectionEmpty = async () => {
-    const spaceUsages = await SpaceUsage.find({});
+    const spaces = await SpaceUsage.find({});
 
-    if (spaceUsages.length) {
+    if (spaces.length) {
       await SpaceUsage.collection.drop();
     }
   };
@@ -28,7 +28,7 @@ describe('space', () => {
 
   before(async () => {
     config = getConfigForEnvironment(process.env.NODE_ENV);
-    await mongoose.connect(config.spaceUsageDatabase.uri, { useNewUrlParser: true });
+    await mongoose.connect(config.spaceDatabase.uri, { useNewUrlParser: true });
   });
 
   beforeEach(async () => {
@@ -51,8 +51,8 @@ describe('space', () => {
   });
 
   it('should save space when validation is successful', async function () {
-    const spaceUsage = new SpaceUsage(mockSpaceUsage);
-    const savedSpaceUsage = await spaceUsage.save();
+    const space = new SpaceUsage(mockSpaceUsage);
+    const savedSpaceUsage = await space.save();
 
     expect(savedSpaceUsage.usagePeriodStartTime.getTime())
       .to.equal(mockSpaceUsage.usagePeriodStartTime);
