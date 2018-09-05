@@ -2,24 +2,24 @@
 const { expect } = require('chai');
 const mongoose = require('mongoose');
 const { getConfigForEnvironment } = require('../config/config.js');
-const SpaceUsage = require('./space.js');
+const Space = require('./space.js');
 
 describe('space', () => {
   let config;
-  let mockSpaceUsage;
+  let mockSpace;
 
-  const ensureSpaceUsageCollectionEmpty = async () => {
-    const spaces = await SpaceUsage.find({});
+  const ensureSpaceCollectionEmpty = async () => {
+    const spaces = await Space.find({});
 
     if (spaces.length) {
-      await SpaceUsage.collection.drop();
+      await Space.collection.drop();
     }
   };
 
-  const doesSaveSpaceUsageThrowError = async () => {
-    const mongooseSpaceUsageBeforeSave = new SpaceUsage(mockSpaceUsage);
+  const doesSaveSpaceThrowError = async () => {
+    const mongooseSpaceBeforeSave = new Space(mockSpace);
     try {
-      await mongooseSpaceUsageBeforeSave.save();
+      await mongooseSpaceBeforeSave.save();
       return false;
     } catch (error) {
       return true;
@@ -28,44 +28,50 @@ describe('space', () => {
 
   before(async () => {
     config = getConfigForEnvironment(process.env.NODE_ENV);
-    await mongoose.connect(config.spaceDatabase.uri, { useNewUrlParser: true });
+    await mongoose.connect(config.spaceUsageDatabase.uri, { useNewUrlParser: true });
   });
 
   beforeEach(async () => {
-    await ensureSpaceUsageCollectionEmpty();
+    await ensureSpaceCollectionEmpty();
 
-    const usagePeriodStartTime = new Date('December 1, 2018 12:00:00').getTime();
-    const usagePeriodEndTime = new Date('December 1, 2018 12:30:00').getTime();
-
-    mockSpaceUsage = {
-      spaceId: 'ID13413',
-      usagePeriodStartTime,
-      usagePeriodEndTime,
-      numberOfPeopleRecorded: 5,
+    mockSpace = {
+      name: 'Meeting room 1',
+      occupancyCapacity: 8,
+      siteId: '1',
     };
   });
 
   after(async () => {
-    await ensureSpaceUsageCollectionEmpty();
-    mongoose.connection.close();
+    await ensureSpaceCollectionEmpty();
+    await mongoose.connection.close();
   });
 
   it('should save space when validation is successful', async function () {
-    const space = new SpaceUsage(mockSpaceUsage);
-    const savedSpaceUsage = await space.save();
+    const space = new Space(mockSpace);
+    const savedSpace = await space.save();
 
-    expect(savedSpaceUsage.usagePeriodStartTime.getTime())
-      .to.equal(mockSpaceUsage.usagePeriodStartTime);
-    expect(savedSpaceUsage.usagePeriodEndTime.getTime())
-      .to.equal(mockSpaceUsage.usagePeriodEndTime);
-
-    expect(savedSpaceUsage.spaceId).to.equal(mockSpaceUsage.spaceId);
-    expect(savedSpaceUsage.numberOfPeopleRecorded).to.equal(mockSpaceUsage.numberOfPeopleRecorded);
+    expect(savedSpace.name).to.equal(mockSpace.name);
+    expect(savedSpace.occupancyCapacity).to.equal(mockSpace.occupancyCapacity);
+    expect(savedSpace.siteId).to.equal(mockSpace.siteId);
   });
 
-  it('should reject save if space id not provided', async function () {
-    mockSpaceUsage.spaceId = '';
-    const wasErrorThrown = await doesSaveSpaceUsageThrowError();
+  it('should reject save if name not provided', async function () {
+    mockSpace.name = '';
+    const wasErrorThrown = await doesSaveSpaceThrowError();
+
+    expect(wasErrorThrown).to.equal(true);
+  });
+
+  it('should reject save if occupancyCapacity not provided', async function () {
+    mockSpace.occupancyCapacity = '';
+    const wasErrorThrown = await doesSaveSpaceThrowError();
+
+    expect(wasErrorThrown).to.equal(true);
+  });
+
+  it('should reject save if siteId not provided', async function () {
+    mockSpace.siteId = '';
+    const wasErrorThrown = await doesSaveSpaceThrowError();
 
     expect(wasErrorThrown).to.equal(true);
   });
