@@ -1,27 +1,15 @@
 
 const config = {
   development: {
-    spaceUsageDatabase: {
-      uri: 'mongodb://localhost:27017/space_usage_dev',
-    },
   },
 
   test: {
-    spaceUsageDatabase: {
-      uri: process.env.MONGODB_URI,
-    },
   },
 
   qa: {
-    spaceUsageDatabase: {
-      uri: process.env.MONGODB_URI,
-    },
   },
 
   production: {
-    spaceUsageDatabase: {
-      uri: process.env.MONGODB_URI,
-    },
   },
 };
 
