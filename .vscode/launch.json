@@ -66,6 +66,21 @@
     {
         "type": "node",
         "request": "launch",
+        "name": "space api tests",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*space_api_test.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
         "name": "function poller tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [

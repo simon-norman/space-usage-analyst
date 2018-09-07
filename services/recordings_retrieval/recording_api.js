@@ -13,7 +13,7 @@ const checkStampFactoryArgumentsValid = (BaseApiStamp) => {
 
 module.exports = (BaseApiStamp) => {
   checkStampFactoryArgumentsValid(BaseApiStamp);
-  const AccuwareApiStamp = stampit({
+  const RecordingApiStamp = stampit({
     props: {
       baseRecordingsPath: '/recordings/',
     },
@@ -27,5 +27,5 @@ module.exports = (BaseApiStamp) => {
       },
     },
   });
-  return AccuwareApiStamp.compose(BaseApiStamp);
+  return RecordingApiStamp.compose(BaseApiStamp);
 };
