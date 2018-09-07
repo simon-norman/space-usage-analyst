@@ -78,15 +78,5 @@ describe('recording_api', () => {
       expect(createStampWithoutParameters).to.throw(Error);
     });
   });
-
-  describe('Errors when creating recording api instance', () => {
-    beforeEach(() => {
-      setUpMockBaseApi();
-
-      setRecordingsCallParams();
-
-      RecordingApiStamp = RecordingApiStampFactory(BaseApiStamp);
-    });
-  });
 });
 
