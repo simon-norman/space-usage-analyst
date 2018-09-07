@@ -11,8 +11,8 @@ describe('space_usage_analysis_scheduler', () => {
       const SpaceUsageAnalysisSchedulerStamp = SpaceUsageAnalysisSchedulerStampFactory();
       const spaceUsageAnalysisScheduler = SpaceUsageAnalysisSchedulerStamp();
 
-      const mockFunctionToSchedule = (date) => {
-        console.log(date);
+      const mockFunctionToSchedule = (params) => {
+        console.log(params);
       };
 
       spaceUsageAnalysisScheduler.scheduleUsageAnalysis([0, 15, 30, 45], mockFunctionToSchedule);

@@ -11,10 +11,10 @@ module.exports = () => stampit({
         const params = {
           areaId: '1A',
           startTime: fireDate - usageAnalysisPeriod,
-          endTime: fireDate,
+          endTime: fireDate.getTime(),
         };
 
-        functionToCall();
+        functionToCall(params);
       };
 
       const rule = new schedule.RecurrenceRule();
