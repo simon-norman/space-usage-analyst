@@ -123,4 +123,15 @@ describe('recordings_for_site_getter', function () {
     await setPromisifiedTimeout(50);
     expect(returnedRecordings).to.deep.equal(expectedReturnedRecordings);
   });
+
+  it('should retry get spaces if call returns ', async function () {
+    const returnedRecordings = [];
+    allRecordingsByTimeframeGetter.on('recordings-by-space-timeframe', (recordingsBySpaceAndTimeframe) => {
+      returnedRecordings.push(recordingsBySpaceAndTimeframe);
+    });
+    allRecordingsByTimeframeGetter.getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+
+    await setPromisifiedTimeout(50);
+    expect(returnedRecordings).to.deep.equal(expectedReturnedRecordings);
+  });
 });
