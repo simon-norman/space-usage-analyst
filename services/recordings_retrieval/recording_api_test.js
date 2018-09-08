@@ -9,16 +9,16 @@ const RecordingApiStampFactory = require('./recording_api.js');
 describe('recording_api', () => {
   let mockRecordings;
   let getStub;
-  let BaseApiStamp;
+  let MockRetryEnabledApiStamp;
   let recordingsCallParams;
   let RecordingApiStamp;
   let recordingApi;
 
-  const setUpMockBaseApi = () => {
+  const setUpMockRetryEnabledApi = () => {
     mockRecordings = 'devicerecordings';
     getStub = sinon.stub();
     getStub.returns(mockRecordings);
-    BaseApiStamp = stampit({
+    MockRetryEnabledApiStamp = stampit({
       init() {
         this.get = getStub;
       },
@@ -34,11 +34,11 @@ describe('recording_api', () => {
   };
 
   const setUpTests = () => {
-    setUpMockBaseApi();
+    setUpMockRetryEnabledApi();
 
     setRecordingsCallParams();
 
-    RecordingApiStamp = RecordingApiStampFactory(BaseApiStamp);
+    RecordingApiStamp = RecordingApiStampFactory(MockRetryEnabledApiStamp);
     recordingApi = RecordingApiStamp();
   };
 
@@ -70,7 +70,7 @@ describe('recording_api', () => {
   });
 
   describe('Errors when creating recording api stamp', () => {
-    it('should throw error if base api stamp not provided', async () => {
+    it('should throw error if retry enabled api stamp not provided', async () => {
       const createStampWithoutParameters = () => {
         RecordingApiStampFactory();
       };

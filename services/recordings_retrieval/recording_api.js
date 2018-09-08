@@ -1,9 +1,9 @@
 const stampit = require('stampit');
 
-const checkStampFactoryArgumentsValid = (BaseApiStamp) => {
+const checkStampFactoryArgumentsValid = (RetryEnabledApiStamp) => {
   const errors = [];
-  if (!BaseApiStamp) {
-    errors.push('Base Api Stamp not provided to Api stamp factory');
+  if (!RetryEnabledApiStamp) {
+    errors.push('Retry Enabled Stamp not provided to Api stamp factory');
   }
 
   if (errors.length) {
@@ -11,8 +11,8 @@ const checkStampFactoryArgumentsValid = (BaseApiStamp) => {
   }
 };
 
-module.exports = (BaseApiStamp) => {
-  checkStampFactoryArgumentsValid(BaseApiStamp);
+module.exports = (RetryEnabledApiStamp) => {
+  checkStampFactoryArgumentsValid(RetryEnabledApiStamp);
   const RecordingApiStamp = stampit({
     props: {
       baseRecordingsPath: '/recordings/',
@@ -27,5 +27,5 @@ module.exports = (BaseApiStamp) => {
       },
     },
   });
-  return RecordingApiStamp.compose(BaseApiStamp);
+  return RecordingApiStamp.compose(RetryEnabledApiStamp);
 };

@@ -9,16 +9,16 @@ const SpaceApiStampFactory = require('./space_api.js');
 describe('space_api', () => {
   let mockSpaces;
   let getStub;
-  let BaseApiStamp;
+  let RetryEnabledApiStamp;
   let mockGetSpacesParams;
   let SpaceApiStamp;
   let spaceApi;
 
-  const setUpMockBaseApi = () => {
+  const setUpMockRetryEnabledApi = () => {
     mockSpaces = 'devicespaces';
     getStub = sinon.stub();
     getStub.returns(mockSpaces);
-    BaseApiStamp = stampit({
+    RetryEnabledApiStamp = stampit({
       init() {
         this.get = getStub;
       },
@@ -26,11 +26,11 @@ describe('space_api', () => {
   };
 
   const setUpTests = () => {
-    setUpMockBaseApi();
+    setUpMockRetryEnabledApi();
 
     mockGetSpacesParams = 'mock get spaces params';
 
-    SpaceApiStamp = SpaceApiStampFactory(BaseApiStamp);
+    SpaceApiStamp = SpaceApiStampFactory(RetryEnabledApiStamp);
     spaceApi = SpaceApiStamp();
   };
 
@@ -56,7 +56,7 @@ describe('space_api', () => {
   });
 
   describe('Errors when creating space api stamp', () => {
-    it('should throw error if base api stamp not provided', async () => {
+    it('should throw error if retry enabled api stamp not provided', async () => {
       const createStampWithoutParameters = () => {
         SpaceApiStampFactory();
       };
