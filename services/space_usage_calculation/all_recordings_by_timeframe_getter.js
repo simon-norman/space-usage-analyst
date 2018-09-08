@@ -1,6 +1,6 @@
 const stampit = require('stampit');
 
-module.exports = (EventEmittableStamp, spaceApi, recordingApi) => {
+module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException, RecoverableError) => {
   const AllRecordingsByTimeframeGetterStamp = stampit({
     props: {
       spaceApi,
@@ -17,13 +17,24 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi) => {
 
           Promise.all(allPromisesToGetThenEmitRecordings);
         } catch (error) {
-          console.log(error);
+          if (error instanceof RecoverableError) {
+            logException(error);
+          }
+          throw error;
         }
       },
 
-      getAllSpaces() {
-        return this.spaceApi.getSpaces()
-          .then(response => response.data);
+      async getAllSpaces() {
+        try {
+          const spaces = await this.spaceApi.getSpaces().data;
+          return spaces;
+        } catch (error) {
+          if (error.response.status === 404) {
+            throw new RecoverableError(error);
+          } else {
+            throw error;
+          }
+        }
       },
 
       getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime }) {
