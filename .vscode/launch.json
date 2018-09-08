@@ -51,6 +51,21 @@
     {
         "type": "node",
         "request": "launch",
+        "name": "all recordings by timeframe getter test",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*all_recordings_by_timeframe_getter_test.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
         "name": "base api tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [

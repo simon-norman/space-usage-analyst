@@ -7,7 +7,7 @@ const SpaceUsageAnalysisSchedulerStampFactory = require('./space_usage_analysis_
 
 describe('space_usage_analysis_scheduler', () => {
   describe('', () => {
-    it('', (done) => {
+    it('should create a new schedule that calls the specified function', (done) => {
       const SpaceUsageAnalysisSchedulerStamp = SpaceUsageAnalysisSchedulerStampFactory();
       const spaceUsageAnalysisScheduler = SpaceUsageAnalysisSchedulerStamp();
 
