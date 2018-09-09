@@ -1,10 +1,12 @@
 const stampit = require('stampit');
+const AxiosError = require('axios-error');
 
-module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException, RecoverableError) => {
+module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => {
   const AllRecordingsByTimeframeGetterStamp = stampit({
     props: {
       spaceApi,
       recordingApi,
+      logException,
     },
 
     methods: {
@@ -15,26 +17,28 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException, Rec
           const allPromisesToGetThenEmitRecordings
             = this.getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime });
 
-          Promise.all(allPromisesToGetThenEmitRecordings);
+          await Promise.all(allPromisesToGetThenEmitRecordings);
         } catch (error) {
-          if (error instanceof RecoverableError) {
-            logException(error);
-          }
-          throw error;
+          this.handleGetAllRecordingsError(error);
         }
       },
 
       async getAllSpaces() {
         try {
-          const spaces = await this.spaceApi.getSpaces().data;
-          return spaces;
+          const { data } = await this.spaceApi.getSpaces();
+          return data;
         } catch (error) {
-          if (error.response.status === 404) {
-            throw new RecoverableError(error);
-          } else {
-            throw error;
-          }
+          throw this.createGetSpacesError(error);
         }
+      },
+
+      createGetSpacesError(error) {
+        if (error.response && error.response.status === 404) {
+          const spacesNotFoundError = new AxiosError('No spaces found', error);
+          spacesNotFoundError.isRecoverable = true;
+          return spacesNotFoundError;
+        }
+        return error;
       },
 
       getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime }) {
@@ -53,16 +57,21 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException, Rec
       },
 
       getPromiseToGetThenEmitRecordings(paramsToGetRecordings) {
-        return new Promise(async (resolve) => {
+        return new Promise(async (resolve, reject) => {
           let recordings;
+
           try {
             recordings = await this.getRecordingsByTimeframeAndSpaceId(paramsToGetRecordings);
+            this.emitRecordings(recordings, paramsToGetRecordings);
+            resolve();
           } catch (error) {
-            console.log(error);
+            if (error.response && error.response.status === 404) {
+              const recordingsNotFoundError = new AxiosError('No recordings found', error);
+              this.logException(recordingsNotFoundError);
+              resolve();
+            }
+            reject(new AxiosError(error));
           }
-
-          this.emitRecordings(recordings, paramsToGetRecordings);
-          resolve();
         });
       },
 
@@ -80,6 +89,14 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException, Rec
         };
 
         this.emit('recordings-by-space-timeframe', recordingsBySpaceIdAndTimeframe);
+      },
+
+      handleGetAllRecordingsError(error) {
+        if (error.isRecoverable) {
+          this.logException(error);
+        } else {
+          throw error;
+        }
       },
     },
   });

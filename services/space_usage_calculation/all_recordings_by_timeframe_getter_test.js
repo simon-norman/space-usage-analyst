@@ -142,16 +142,45 @@ describe('recordings_for_site_getter', function () {
       };
       stubbedGetSpaces.returns(Promise.reject(noSpacesFoundResponse));
 
-      allRecordingsByTimeframeGetter.getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+      await allRecordingsByTimeframeGetter
+        .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
 
       expect(logExceptionSpy.firstCall.args[0].message).equals('No spaces found');
     });
 
     it('should throw error if any other error thrown during get spaces call', async function () {
-      stubbedGetSpaces.returns(Promise.reject());
+      const someError = new Error('some error');
+      stubbedGetSpaces.returns(Promise.reject(someError));
 
       const promiseToGetRecordings =
-      allRecordingsByTimeframeGetter.getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+        allRecordingsByTimeframeGetter
+          .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+
+      expect(promiseToGetRecordings).to.be.rejected;
+    });
+
+    it('should log exception without throwing error further if 404 returned by get recordings call', async function () {
+      const noRecordingsFoundResponse = {
+        response: {
+          status: 404,
+          message: 'No recordings found',
+        },
+      };
+      stubbedGetRecordings.returns(Promise.reject(noRecordingsFoundResponse));
+
+      await allRecordingsByTimeframeGetter
+        .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+
+      expect(logExceptionSpy.firstCall.args[0].message).equals('No recordings found');
+    });
+
+    it('should throw error if any other error thrown during get recordings call', async function () {
+      const someError = new Error('some error');
+      stubbedGetRecordings.returns(Promise.reject(someError));
+
+      const promiseToGetRecordings =
+        allRecordingsByTimeframeGetter
+          .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
 
       expect(promiseToGetRecordings).to.be.rejected;
     });
