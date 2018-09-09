@@ -79,12 +79,6 @@ describe('recordings_for_site_getter', function () {
     ];
   };
 
-  const setPromisifiedTimeout = timeoutPeriodInMilliseconds => new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, timeoutPeriodInMilliseconds);
-  });
-
   beforeEach(() => {
     setUpMockSpaceApi();
 
@@ -96,16 +90,16 @@ describe('recordings_for_site_getter', function () {
   });
 
   describe('successfully get recordings', function () {
-    it('should call spaces api to retrieve all spaces', function () {
-      allRecordingsByTimeframeGetter.getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+    it('should call spaces api to retrieve all spaces', async function () {
+      await allRecordingsByTimeframeGetter
+        .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
 
       expect(stubbedGetSpaces).always.have.been.calledOnce;
     });
 
     it('should, for each of the retrieved spaces, call recordings api with correct parameters', async function () {
-      allRecordingsByTimeframeGetter.getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
-
-      await setPromisifiedTimeout(50);
+      await allRecordingsByTimeframeGetter
+        .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
 
       expect(stubbedGetRecordings.firstCall.args[0]).deep.equals({
         spaceId: mockSpaces[0]._id,
@@ -125,9 +119,10 @@ describe('recordings_for_site_getter', function () {
       allRecordingsByTimeframeGetter.on('recordings-by-space-timeframe', (recordingsBySpaceAndTimeframe) => {
         returnedRecordings.push(recordingsBySpaceAndTimeframe);
       });
-      allRecordingsByTimeframeGetter.getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
 
-      await setPromisifiedTimeout(50);
+      await allRecordingsByTimeframeGetter
+        .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+
       expect(returnedRecordings).to.deep.equal(expectedReturnedRecordings);
     });
   });

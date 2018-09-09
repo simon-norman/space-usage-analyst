@@ -50,6 +50,7 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
             endTime,
             spaceId: space._id,
           });
+
           allPromisesToGetThenEmitRecordings.push(promiseToGetThenEmitRecordings);
         }
 
