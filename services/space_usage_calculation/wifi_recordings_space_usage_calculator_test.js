@@ -1,6 +1,6 @@
 const { expect } = require('chai');
-const SpaceUsageCalculatorStampFactory = require('./space_usage_calculator_test');
-const RecordingsPerSnapshotCalculatorStampFactory = require('./space_usage_calculator_test');
+const SpaceUsageCalculatorStampFactory = require('./wifi_recordings_space_usage_calculator_test');
+const RecordingsPerSnapshotCalculatorStampFactory = require('./wifi_recordings_space_usage_calculator_test');
 
 
 describe('space_usage_calculator', function () {
