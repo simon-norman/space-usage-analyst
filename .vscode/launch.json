@@ -66,6 +66,21 @@
     {
         "type": "node",
         "request": "launch",
+        "name": "wifi recordings deduplicator",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*wifi_recordings_deduplicator_test.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
         "name": "base api tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
