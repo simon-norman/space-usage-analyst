@@ -3,7 +3,7 @@ const SpaceUsageCalculatorStampFactory = require('./space_usage_calculator_test'
 const RecordingsPerSnapshotCalculatorStampFactory = require('./space_usage_calculator_test');
 
 
-describe('people_per_period_calculator', function () {
+describe('space_usage_calculator', function () {
   let SpaceUsageCalculatorStamp;
   let spaceUsageCalculator;
   let mockRecordings;
