@@ -4,16 +4,19 @@ module.exports = (
   wifiRecordingsDeduplicator,
   NoPeopleInUsagePeriodCalculatorStamp,
   spaceUsageApi,
+  recordingsGetter,
 ) => stampit({
   props: {
     wifiRecordingsDeduplicator,
     NoPeopleInUsagePeriodCalculatorStamp,
     spaceUsageApi,
+    recordingsGetter,
   },
 
   methods: {
-    startCalculatingSpaceUsage(recordingsGetter) {
-      recordingsGetter.on('recordings-by-space-timeframe', this.calculateSpaceUsageForUsagePeriod());
+    calculateSpaceUsage(usagePeriodStartEndTimes) {
+      this.recordingsGetter.on('recordings-by-space-timeframe', this.calculateSpaceUsageForUsagePeriod());
+      this.recordingsGetter.getAllRecordingsByTimeframe(usagePeriodStartEndTimes);
     },
 
     calculateSpaceUsageForUsagePeriod({
@@ -56,8 +59,8 @@ module.exports = (
       };
     },
 
-    saveSpaceUsage() {
-      this.spaceUsageApi.saveSpaceUsage()
+    saveSpaceUsage(spaceUsage) {
+      this.spaceUsageApi.saveSpaceUsage(spaceUsage)
         .catch((error) => {
           throw error;
         });

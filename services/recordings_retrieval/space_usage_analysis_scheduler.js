@@ -3,24 +3,29 @@ const stampit = require('stampit');
 const schedule = require('node-schedule');
 
 
-module.exports = () => stampit({
+module.exports = wifiRecordingsSpaceUsageCalculator => stampit({
   methods: {
-    scheduleUsageAnalysis(minutesOfTheHour, functionToCall) {
-      const getRecordings = (fireDate) => {
-        const usageAnalysisPeriod = 900000;
-        const params = {
-          areaId: '1A',
-          startTime: fireDate - usageAnalysisPeriod,
-          endTime: fireDate.getTime(),
+    scheduleUsageAnalysis({
+      usageAnalysisPeriod,
+      secondsOfMinute,
+      minutesOfHour,
+      hoursOfDay,
+    }) {
+      const scheduledCalculateSpaceUsage = (datetimeFunctionExecuted) => {
+        const usagePeriodStartEndTimes = {
+          startTime: datetimeFunctionExecuted - usageAnalysisPeriod,
+          endTime: datetimeFunctionExecuted.getTime(),
         };
 
-        functionToCall(params);
+        wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(usagePeriodStartEndTimes);
       };
 
       const rule = new schedule.RecurrenceRule();
-      rule.minute = minutesOfTheHour;
-      schedule.scheduleJob('*/1 * * * * *', (fireDate) => {
-        getRecordings(fireDate);
+      rule.second = secondsOfMinute;
+      rule.minute = minutesOfHour;
+      rule.hour = hoursOfDay;
+      schedule.scheduleJob(rule, (datetimeFunctionExecuted) => {
+        scheduledCalculateSpaceUsage(datetimeFunctionExecuted);
       });
     },
   },
