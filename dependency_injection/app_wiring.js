@@ -20,6 +20,8 @@ let diContainer;
 const registerApis = () => {
   diContainer.registerDependencyFromFactory('BaseApiStamp', BaseApiStampFactory);
   diContainer.registerDependencyFromFactory('RetryEnabledApiStamp', RetryEnabledApiStampFactory);
+  const RetryEnabledApiStamp = diContainer.getDependency('RetryEnabledApiStamp');
+  diContainer.registerDependencyFromStamp('retryEnabledApi', RetryEnabledApiStamp);
   diContainer.registerDependencyFromFactory('RecordingApiStamp', RecordingApiStampFactory);
   diContainer.registerDependencyFromFactory('SpaceUsageApiStamp', SpaceUsageApiStampFactory);
 };

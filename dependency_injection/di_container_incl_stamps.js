@@ -5,6 +5,13 @@ const stampit = require('stampit');
 module.exports = (DiContainerStamp) => {
   const DiContainerInclStampsStamp = stampit({
     methods: {
+      registerDependencyFromStampFactory(name, stampFactory) {
+        const dependenciesOfStamp = this.getDependenciesOfStamp(stamp);
+        const dependencyFromStamp = stamp(dependenciesOfStamp);
+
+        this.registerDependencyFromStamp(name, dependencyFromStamp);
+      },
+
       registerDependencyFromStamp(name, stamp) {
         const dependenciesOfStamp = this.getDependenciesOfStamp(stamp);
         const dependencyFromStamp = stamp(dependenciesOfStamp);
@@ -13,15 +20,26 @@ module.exports = (DiContainerStamp) => {
       },
 
       getDependenciesOfStamp(stamp) {
-        const stampDependencyNames = [];
+        const stampDependencies = {};
         for (const initializer of stamp.compose.initializers) {
-          const stampDependencyNamesForThisInitializer = parseFunctionArgs(initializer);
+          const destructuredParams = parseFunctionArgs(initializer)[0];
+          const stampDependencyNamesForThisInitializer =
+            this.getKeysFromDestructuredParams(destructuredParams);
+
           stampDependencyNamesForThisInitializer.forEach((dependencyName) => {
-            stampDependencyNames.push(dependencyName);
+            const stampDependency = this.getDependency(dependencyName);
+            stampDependencies[dependencyName] = stampDependency;
           });
         }
 
-        return this.getDependencies(stampDependencyNames);
+        return stampDependencies;
+      },
+
+      getKeysFromDestructuredParams(destructuredParams) {
+        const destructuredParamsWithoutLeftBracket = destructuredParams.replace('{', '');
+        const destructuredParamsWithoutBrackets = destructuredParamsWithoutLeftBracket.replace('}', '');
+        const destructuredParamsWithoutSpaces = destructuredParamsWithoutBrackets.replace(' ', '');
+        return destructuredParamsWithoutSpaces.split(',');
       },
     },
   });

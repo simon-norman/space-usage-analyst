@@ -3,7 +3,7 @@ const axios = require('axios');
 
 module.exports = () => {
   const BaseApiStamp = stampit({
-    init(apiConfig) {
+    init({ apiConfig }) {
       this.checkBaseApiStampArgumentsValid(apiConfig);
       this.axios = axios.create({
         baseURL: apiConfig.baseUrl,

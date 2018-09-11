@@ -6,9 +6,9 @@ const DiContainerStampFactory = require('./di_container');
 const stampit = require('stampit');
 
 describe('di_container', () => {
-  let dependencyOne;
+  let dependencyOneData;
   let mockStampOne;
-  let dependencyTwo;
+  let dependencyTwoData;
   let mockStampTwo;
   let diContainerInclStamps;
 
@@ -19,7 +19,7 @@ describe('di_container', () => {
   };
 
   const setUpMockStampOne = () => {
-    dependencyOne = 'dependency one';
+    dependencyOneData = 'dependency one';
 
     mockStampOne = stampit({
       init({ dependencyOne }) {
@@ -29,7 +29,7 @@ describe('di_container', () => {
   };
 
   const setUpMockStampTwo = () => {
-    dependencyTwo = 'dependency two';
+    dependencyTwoData = 'dependency two';
 
     mockStampTwo = stampit({
       init({ dependencyTwo }) {
@@ -50,12 +50,12 @@ describe('di_container', () => {
 
   describe('successfully register and return dependencies', () => {
     it('should generate dependency from stamp, injecting it with its required dependencies, then register it', () => {
-      diContainerInclStamps.registerDependency('dependencyOne', dependencyOne);
-      diContainerInclStamps.registerDependency('dependencyTwo', dependencyTwo);
+      diContainerInclStamps.registerDependency('dependencyOne', dependencyOneData);
+      diContainerInclStamps.registerDependency('dependencyTwo', dependencyTwoData);
       diContainerInclStamps.registerDependencyFromStamp('mockTwo', mockStampTwo);
       const mockTwo = diContainerInclStamps.getDependency('mockTwo');
-      expect(mockTwo.dependencyOne).equals(dependencyOne);
-      expect(mockTwo.dependencyTwo).equals(dependencyTwo);
+      expect(mockTwo.dependencyOne).equals(dependencyOneData);
+      expect(mockTwo.dependencyTwo).equals(dependencyTwoData);
     });
   });
 });

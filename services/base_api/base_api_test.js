@@ -9,7 +9,7 @@ describe('base_api', () => {
   let BaseApiStamp;
 
   const wrappedCreateAccuwareApi = function () {
-    BaseApiStamp(apiConfig);
+    BaseApiStamp({ apiConfig });
   };
 
   beforeEach(() => {
@@ -20,7 +20,7 @@ describe('base_api', () => {
 
   it('should create api initiliased with the base URL and credentials', async function () {
     BaseApiStamp = BaseApiStampFactory();
-    const baseApi = BaseApiStamp(apiConfig);
+    const baseApi = BaseApiStamp({ apiConfig });
 
     expect(baseApi.axios.defaults.baseURL).to.equal(apiConfig.baseUrl);
   });
