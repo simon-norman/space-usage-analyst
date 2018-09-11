@@ -1,14 +1,21 @@
-const { expect } = require('chai');
-const SpaceUsageCalculatorStampFactory = require('./wifi_recordings_space_usage_calculator_test');
-const RecordingsPerSnapshotCalculatorStampFactory = require('./wifi_recordings_space_usage_calculator_test');
+
+const WifiRecordingsSpaceUsageCalculatorStampFactory = require('./wifi_recordings_space_usage_calculator');
+const sinon = require('sinon');
+const chai = require('chai');
+const sinonChai = require('sinon-chai');
+const chaiAsPromised = require('chai-as-promised');
+
+chai.use(sinonChai);
+chai.use(chaiAsPromised);
+const { expect } = chai;
 
 
 describe('space_usage_calculator', function () {
-  let SpaceUsageCalculatorStamp;
-  let spaceUsageCalculator;
+  let WifiRecordingsSpaceUsageCalculatorStamp;
+  let wifiRecordingsSpaceUsageCalculator;
   let mockRecordings;
   let calculateSpaceUsageParams;
-  let expectedSpaceUsage;
+  let stubbedDedupeRecordings;
 
   const setUpMockRecordings = () => {
     mockRecordings = [];
@@ -52,41 +59,31 @@ describe('space_usage_calculator', function () {
     };
   };
 
-  const setUpExpectedSpaceUsage = () => {
-    expectedSpaceUsage = [
-      {
-        spaceId: 1,
-        usagePeriodStartTimestamp: calculateSpaceUsageParams.usagePeriodStartTimestamp,
-        usagePeriodEndTimestamp: calculateSpaceUsageParams.usagePeriodEndTimestamp,
-        numberOfPeopleRecorded: 3,
-      },
-      {
-        spaceId: 2,
-        usagePeriodStartTimestamp: calculateSpaceUsageParams.usagePeriodStartTimestamp,
-        usagePeriodEndTimestamp: calculateSpaceUsageParams.usagePeriodEndTimestamp,
-        numberOfPeopleRecorded: 3,
-      },
-      {
-        spaceId: 3,
-        usagePeriodStartTimestamp: calculateSpaceUsageParams.usagePeriodStartTimestamp,
-        usagePeriodEndTimestamp: calculateSpaceUsageParams.usagePeriodEndTimestamp,
-        numberOfPeopleRecorded: 2,
-      },
-    ];
+  const setUpMockWifiRecordingsDeduplicator = () => {
+    stubbedDedupeRecordings = sinon.stub();
+    stubbedDedupeRecordings.returns('deduped recordings');
+
+    mockWifiRecordingsDeduplicator = {
+
+    },
+  };
+
+  const setUpWfiRecordingsSpaceUsageCalculator = () => {
+    WifiRecordingsSpaceUsageCalculatorStamp =
+      WifiRecordingsSpaceUsageCalculatorStampFactory();
+    wifiRecordingsSpaceUsageCalculator = WifiRecordingsSpaceUsageCalculatorStamp();
   };
 
   beforeEach(() => {
-    SpaceUsageCalculatorStamp = SpaceUsageCalculatorStampFactory();
+    setUpMockWifiRecordingsDeduplicator();
 
-    spaceUsageCalculator = SpaceUsageCalculatorStamp();
-
-    setUpCalculateSpaceUsageParams();
+    setUpWfiRecordingsSpaceUsageCalculator();
   });
 
-  it('should calculate the number of people in each space, within a given period', function () {
-    const spaceUsage = spaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+  it('should calculate the number of people in a space within a given period', function () {
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
-    setUpExpectedSpaceUsage();
-    expect(spaceUsage).to.equal(expectedSpaceUsage);
+    expect(stubbedDedupeRecordings.firstCall[0]).equals(firstMockRecordings);
+    expect(stubbedDedupeRecordings.secondCall[0]).equals(secondMockRecordings);
   });
 });

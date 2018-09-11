@@ -2,17 +2,17 @@ const stampit = require('stampit');
 
 module.exports = (
   wifiRecordingsDeduplicator,
-  noPeopleInUsagePeriodCalculator,
+  NoPeopleInUsagePeriodCalculatorStamp,
   spaceUsageApi,
 ) => stampit({
   props: {
     wifiRecordingsDeduplicator,
-    noPeopleInUsagePeriodCalculator,
+    NoPeopleInUsagePeriodCalculatorStamp,
     spaceUsageApi,
   },
 
   methods: {
-    calculateSpaceUsage(recordingsGetter) {
+    startCalculatingSpaceUsage(recordingsGetter) {
       recordingsGetter.on('recordings-by-space-timeframe', this.calculateSpaceUsageForUsagePeriod());
     },
 
@@ -23,9 +23,44 @@ module.exports = (
       recordings,
     }) {
       const dedupedWifiRecordings = wifiRecordingsDeduplicator.dedupeRecordings(recordings);
-      const noPeopleInUsagePeriod 
-        = noPeopleInUsagePeriodCalculator.calculateNoOfPeopleInUsagePeriod(recordings);
-      this.spaceUsageApi.saveSpaceUsage();
+
+      const spaceUsage = this.calculateNoOfPeopleInUsagePeriod({
+        spaceId,
+        usagePeriodStartTime: startTime,
+        usagePeriodEndTime: endTime,
+        dedupedWifiRecordings,
+      });
+
+      this.saveSpaceUsage(spaceUsage);
+    },
+
+    calculateNoOfPeopleInUsagePeriod({
+      spaceId,
+      usagePeriodStartTime,
+      usagePeriodEndTime,
+      recordings,
+    }) {
+      const noPeopleInUsagePeriodCalculator = NoPeopleInUsagePeriodCalculatorStamp({
+        usagePeriodStartTime,
+        usagePeriodEndTime,
+        snapshotLengthInMilliseconds: 900000,
+      });
+
+      const noPeopleInUsagePeriod = noPeopleInUsagePeriodCalculator.calculateSpaceUsage(recordings);
+
+      return {
+        spaceId,
+        usagePeriodStartTime,
+        usagePeriodEndTime,
+        numberOfPeopleRecorded: noPeopleInUsagePeriod,
+      };
+    },
+
+    saveSpaceUsage() {
+      this.spaceUsageApi.saveSpaceUsage()
+        .catch((error) => {
+          throw error;
+        });
     },
   },
 });
