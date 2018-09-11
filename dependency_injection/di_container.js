@@ -27,19 +27,24 @@ module.exports = (DependencyNotFoundError, DependencyAlreadyRegisteredError) => 
 
         this.registerDependency(name, dependencyFromFactory);
       } catch (error) {
-        if (error instanceof DependencyNotFoundError) {
-          throw new Error(`Dependency ${name} cannot be registered as one or more of its dependencies have not been registered`);
-        } else {
-          throw error;
-        }
+        throw this.getRegisterDependencyFromConstructorError(error, name);
       }
+    },
+
+    getRegisterDependencyFromConstructorError(error, dependencyName) {
+      if (error instanceof DependencyNotFoundError) {
+        return new Error(`Dependency ${dependencyName} cannot be registered as one or more of its dependencies have not been registered`);
+      }
+      return error;
     },
 
     getDependenciesOfFactory(factory) {
       const dependencyNamesOfFactory = parseFunctionArgs(factory);
-      const dependenciesOfFactory =
-          dependencyNamesOfFactory.map(dependencyName => this.getDependency(dependencyName));
-      return dependenciesOfFactory;
+      return this.getDependencies(dependencyNamesOfFactory);
+    },
+
+    getDependencies(dependencyNames) {
+      return dependencyNames.map(dependencyName => this.getDependency(dependencyName));
     },
 
     getDependency(name) {
