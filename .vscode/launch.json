@@ -156,6 +156,21 @@
     {
         "type": "node",
         "request": "launch",
+        "name": "space usage analysis scheduler test",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*space_usage_analysis_scheduler_test.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
         "name": "function scheduler test",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
