@@ -15,7 +15,7 @@ module.exports = (
 
   methods: {
     calculateSpaceUsage(usagePeriodStartEndTimes) {
-      this.recordingsGetter.on('recordings-by-space-timeframe', this.calculateSpaceUsageForUsagePeriod());
+      this.recordingsGetter.on('recordings-by-space-timeframe', this.calculateSpaceUsageForUsagePeriod);
       this.recordingsGetter.getAllRecordingsByTimeframe(usagePeriodStartEndTimes);
     },
 

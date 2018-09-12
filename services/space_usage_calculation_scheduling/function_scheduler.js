@@ -11,9 +11,18 @@ module.exports = scheduler => stampit({
       functionToSchedule,
     }) {
       const rule = new scheduler.RecurrenceRule();
-      rule.second = secondsOfMinute;
-      rule.minute = minutesOfHour;
-      rule.hour = hoursOfDay;
+
+      if (secondsOfMinute) {
+        rule.second = secondsOfMinute;
+      }
+
+      if (minutesOfHour) {
+        rule.minute = minutesOfHour;
+      }
+
+      if (hoursOfDay) {
+        rule.hour = hoursOfDay;
+      }
 
       scheduler.scheduleJob(rule, functionToSchedule);
     },

@@ -261,7 +261,7 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "Config tests",
+        "name": "Space usage analysis integration tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
             "-u",
@@ -269,7 +269,22 @@
             "--timeout",
             "999999",
             "--colors",
-            "./{,!(node_modules)/**/}*config_test.js"
+            "./{,!(node_modules)/**/}*space_usage_integration_test.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
+        "name": "App wiring tests",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*app_wiring_test.js"
         ],
         "internalConsoleOptions": "openOnSessionStart"
     },
