@@ -21,39 +21,65 @@ const FunctionSchedulerStampFactory = require('../services/space_usage_calculati
 const SpaceUsageAnalysisSchedulerStampFactory = require('../services/space_usage_calculation_scheduling/space_usage_analysis_scheduler');
 
 let diContainer;
+let registerDependency;
+let registerDependencyFromFactory;
+let registerDependencyFromStampFactory;
 const environment = process.env.NODE_ENV;
+
+const getFunctionsFromDiContainer = () => {
+  ({
+    registerDependency,
+    registerDependencyFromFactory,
+    registerDependencyFromStampFactory,
+  } = diContainer);
+
+  registerDependency = registerDependency.bind(diContainer);
+  registerDependencyFromFactory = registerDependencyFromFactory.bind(diContainer);
+  registerDependencyFromStampFactory = registerDependencyFromStampFactory.bind(diContainer);
+};
+
+const setUpDiContainer = () => {
+  const DiContainerStamp = DiContainerStampFactory(
+    DependencyNotFoundError,
+    DependencyAlreadyRegisteredError,
+  );
+  const DiContainerInclStampsStamp = DiContainerInclStampsStampFactory(DiContainerStamp);
+
+  diContainer = DiContainerInclStampsStamp();
+  getFunctionsFromDiContainer();
+};
 
 const registerRecordingApi = () => {
   const recordingApiConfig = getConfigForEnvironment(environment).recordingApi;
-  const RecordingApiStamp = diContainer.registerDependencyFromFactory('RecordingApiStamp', RecordingApiStampFactory);
+  const RecordingApiStamp = registerDependencyFromFactory('RecordingApiStamp', RecordingApiStampFactory);
   const recordingApi = RecordingApiStamp({ apiConfig: recordingApiConfig });
-  diContainer.registerDependency('recordingApi', recordingApi);
+  registerDependency('recordingApi', recordingApi);
 };
 
 const registerSpaceUsageApi = () => {
   const spaceUsageApiConfig = getConfigForEnvironment(environment).spaceUsageApi;
-  const SpaceUsageApiStamp = diContainer.registerDependencyFromFactory('SpaceUsageApiStamp', SpaceUsageApiStampFactory);
+  const SpaceUsageApiStamp = registerDependencyFromFactory('SpaceUsageApiStamp', SpaceUsageApiStampFactory);
   const spaceUsageApi = SpaceUsageApiStamp({ apiConfig: spaceUsageApiConfig });
-  diContainer.registerDependency('spaceUsageApi', spaceUsageApi);
+  registerDependency('spaceUsageApi', spaceUsageApi);
 };
 
 const registerSpaceApi = () => {
   const spaceUsageApiConfig = getConfigForEnvironment(environment).spaceUsageApi;
-  const SpaceApiStamp = diContainer.registerDependencyFromFactory('SpaceApiStamp', SpaceApiStampFactory);
+  const SpaceApiStamp = registerDependencyFromFactory('SpaceApiStamp', SpaceApiStampFactory);
   const spaceApi = SpaceApiStamp({ apiConfig: spaceUsageApiConfig });
-  diContainer.registerDependency('spaceApi', spaceApi);
+  registerDependency('spaceApi', spaceApi);
 };
 
 const registerApis = () => {
-  diContainer.registerDependencyFromFactory('BaseApiStamp', BaseApiStampFactory);
-  diContainer.registerDependencyFromFactory('RetryEnabledApiStamp', RetryEnabledApiStampFactory);
+  registerDependencyFromFactory('BaseApiStamp', BaseApiStampFactory);
+  registerDependencyFromFactory('RetryEnabledApiStamp', RetryEnabledApiStampFactory);
   registerRecordingApi();
   registerSpaceUsageApi();
   registerSpaceApi();
 };
 
 const registerRecordingsRetrieval = () => {
-  diContainer.registerDependencyFromStampFactory(
+  registerDependencyFromStampFactory(
     'allRecordingsByTimeframeGetter',
     'AllRecordingsByTimeframeGetterStamp',
     AllRecordingsByTimeframeGetterStampFactory
@@ -61,14 +87,17 @@ const registerRecordingsRetrieval = () => {
 };
 
 const registerSpaceUsageCalculation = () => {
-  diContainer.registerDependency('objectArrayDedupe', objectArrayDedupe);
-  diContainer.registerDependencyFromStampFactory(
+  registerDependency('objectArrayDedupe', objectArrayDedupe);
+
+  registerDependencyFromStampFactory(
     'wifiRecordingsDeduplicator',
     'WifiRecordingsDeduplicatorStamp',
     WifiRecordingsDeduplicatorStampFactory
   );
-  diContainer.registerDependencyFromFactory('NoPeopleInUsagePeriodCalculatorStamp', NoPeopleInUsagePeriodCalculatorStampFactory);
-  diContainer.registerDependencyFromStampFactory(
+
+  registerDependencyFromFactory('NoPeopleInUsagePeriodCalculatorStamp', NoPeopleInUsagePeriodCalculatorStampFactory);
+
+  registerDependencyFromStampFactory(
     'wifiRecordingsSpaceUsageCalculator',
     'WifiRecordingsSpaceUsageCalculatorStamp',
     WifiRecordingsSpaceUsageCalculatorStampFactory
@@ -76,27 +105,23 @@ const registerSpaceUsageCalculation = () => {
 };
 
 const registerSpaceUsageCalculationScheduling = () => {
-  diContainer.registerDependency('scheduler', scheduler);
-  diContainer.registerDependencyFromFactory('FunctionSchedulerStamp', FunctionSchedulerStampFactory);
-  diContainer.registerDependencyFromFactory('SpaceUsageAnalysisSchedulerStamp', SpaceUsageAnalysisSchedulerStampFactory);
+  registerDependency('scheduler', scheduler);
+  registerDependencyFromFactory('FunctionSchedulerStamp', FunctionSchedulerStampFactory);
+  registerDependencyFromFactory('SpaceUsageAnalysisSchedulerStamp', SpaceUsageAnalysisSchedulerStampFactory);
 };
 
 const wireUpApp = () => {
-  const DiContainerStamp = DiContainerStampFactory(
-    DependencyNotFoundError,
-    DependencyAlreadyRegisteredError,
-  );
-  const DiContainerInclStampsStamp = DiContainerInclStampsStampFactory(DiContainerStamp);
-  diContainer = DiContainerInclStampsStamp();
+  setUpDiContainer();
 
-  diContainer.registerDependency('logException', logException);
+  registerDependency('logException', logException);
 
   registerApis();
-  diContainer.registerDependency('EventEmittableStamp', EventEmittableStamp);
 
+  registerDependency('EventEmittableStamp', EventEmittableStamp);
   registerRecordingsRetrieval();
   registerSpaceUsageCalculation();
   registerSpaceUsageCalculationScheduling();
+
   return diContainer;
 };
 
