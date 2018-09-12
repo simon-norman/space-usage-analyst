@@ -5,11 +5,11 @@ const stampit = require('stampit');
 module.exports = (DiContainerStamp) => {
   const DiContainerInclStampsStamp = stampit({
     methods: {
-      registerDependencyFromStampFactory(name, stampFactory) {
-        const dependenciesOfStamp = this.getDependenciesOfStamp(stamp);
-        const dependencyFromStamp = stamp(dependenciesOfStamp);
+      registerDependencyFromStampFactory(name, stampName, stampFactory) {
+        const stamp = this.registerDependencyFromFactory(stampName, stampFactory);
+        const dependencyFromStamp = this.registerDependencyFromStamp(name, stamp);
 
-        this.registerDependencyFromStamp(name, dependencyFromStamp);
+        return dependencyFromStamp;
       },
 
       registerDependencyFromStamp(name, stamp) {
@@ -17,20 +17,24 @@ module.exports = (DiContainerStamp) => {
         const dependencyFromStamp = stamp(dependenciesOfStamp);
 
         this.registerDependency(name, dependencyFromStamp);
+        return dependencyFromStamp;
       },
 
       getDependenciesOfStamp(stamp) {
         const stampDependencies = {};
-        for (const initializer of stamp.compose.initializers) {
-          const destructuredParams = parseFunctionArgs(initializer)[0];
-          const stampDependencyNamesForThisInitializer =
-            this.getKeysFromDestructuredParams(destructuredParams);
+        if (stamp.compose.initializers) {
+          for (const initializer of stamp.compose.initializers) {
+            const destructuredParams = parseFunctionArgs(initializer)[0];
+            const stampDependencyNamesForThisInitializer =
+              this.getKeysFromDestructuredParams(destructuredParams);
 
-          stampDependencyNamesForThisInitializer.forEach((dependencyName) => {
-            const stampDependency = this.getDependency(dependencyName);
-            stampDependencies[dependencyName] = stampDependency;
-          });
+            stampDependencyNamesForThisInitializer.forEach((dependencyName) => {
+              const stampDependency = this.getDependency(dependencyName);
+              stampDependencies[dependencyName] = stampDependency;
+            });
+          }
         }
+
 
         return stampDependencies;
       },

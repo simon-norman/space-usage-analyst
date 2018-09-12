@@ -30,12 +30,10 @@ describe('di_container', () => {
       expect(registeredDiMockDependency1).to.equal(diMockDependency1);
     });
 
-    it('should generate dependency from factory, injecting it with its required dependencies, then register it', async () => {
+    it('should generate dependency from factory, injecting it with its required dependencies, then register and return it', async () => {
       diContainer.registerDependency('diMockDependency1', diMockDependency1);
       diContainer.registerDependencyFromFactory('diMockDependency2', diMockDependency2);
-      diContainer.registerDependencyFromFactory('diMockDependency3', diMockDependency3);
-
-      const registeredDiMockDependency3 = diContainer.getDependency('diMockDependency3');
+      const registeredDiMockDependency3 = diContainer.registerDependencyFromFactory('diMockDependency3', diMockDependency3);
 
       expect(registeredDiMockDependency3.compose.properties.diMockDependency1)
         .to.equal(diMockDependency1);

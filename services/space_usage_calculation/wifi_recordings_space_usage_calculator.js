@@ -4,13 +4,13 @@ module.exports = (
   wifiRecordingsDeduplicator,
   NoPeopleInUsagePeriodCalculatorStamp,
   spaceUsageApi,
-  recordingsGetter,
+  allRecordingsByTimeframeGetter
 ) => stampit({
   props: {
     wifiRecordingsDeduplicator,
     NoPeopleInUsagePeriodCalculatorStamp,
     spaceUsageApi,
-    recordingsGetter,
+    recordingsGetter: allRecordingsByTimeframeGetter,
   },
 
   methods: {

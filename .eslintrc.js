@@ -27,5 +27,12 @@ module.exports = {
       "mocha/prefer-arrow-callback": 2,
       "func-names": 0,
       "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"],
+      "comma-dangle": ["error", {
+        "arrays": "never",
+        "objects": "always-multiline",
+        "imports": "never",
+        "exports": "never",
+        "functions": "ignore"
+    }]
   }
   };
