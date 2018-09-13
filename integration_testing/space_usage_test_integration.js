@@ -25,7 +25,7 @@ describe('space_usage_integration', function () {
     stubbedGetSpaces.returns(Promise.resolve({ data: 'stubbed' }));
     const stubbedSaveUsageAnalysis = sinon.stub(axios, 'post').withArgs(`${baseUrlSpaceUsageApi}/spaceUsage/`);
 
-    const SpaceUsageAnalysis = require('../app');
+    const SpaceUsageAnalysis = require('../app.js');
 
     await setPromisifiedTimeout(50000);
 

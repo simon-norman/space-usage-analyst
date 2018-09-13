@@ -1,7 +1,7 @@
 
 const { wireUpApp } = require('./dependency_injection/app_wiring');
 const { getConfigForEnvironment } = require('./config/config.js');
-const { wrapperToHandleUnhandledExceptions } = require('./services/error_handling/logger/logger.js');
+const LoggerFactory = require('./services/error_handling/logger/logger.js');
 const express = require('express');
 
 let config;
@@ -28,7 +28,7 @@ const startApp = async () => {
   spaceUsageAnalysisScheduler.scheduleUsageAnalysis(scheduleUsageAnalysisConfig);
 };
 
-
+const { wrapperToHandleUnhandledExceptions } = LoggerFactory(process.env.NODE_ENV);
 wrapperToHandleUnhandledExceptions(() => {
   startApp();
 });
