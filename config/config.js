@@ -7,7 +7,7 @@ const config = {
 
     scheduleUsageAnalysis: {
       usageAnalysisPeriod: 900000,
-      secondsOfMinute: Array(...{ length: 60 }).map(Number.call, Number),
+      secondsOfMinute: Array.apply(null, { length: 60 }).map(Number.call, Number),
     },
 
     spaceUsageApi: {
