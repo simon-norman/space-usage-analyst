@@ -7,7 +7,7 @@ const config = {
 
     scheduleUsageAnalysis: {
       usageAnalysisPeriod: 900000,
-      secondsOfMinute: Array.apply(null, {length: 60}).map(Number.call, Number),
+      secondsOfMinute: Array(...{ length: 60 }).map(Number.call, Number),
     },
 
     spaceUsageApi: {
@@ -19,6 +19,10 @@ const config = {
   },
 
   test: {
+    webServer: {
+      port: process.env.PORT,
+    },
+
     scheduleUsageAnalysis: {
       usageAnalysisPeriod: 900000,
       secondsOfMinute: 0,
@@ -34,6 +38,10 @@ const config = {
   },
 
   qa: {
+    webServer: {
+      port: process.env.PORT,
+    },
+
     scheduleUsageAnalysis: {
       usageAnalysisPeriod: 900000,
       secondsOfMinute: 0,
@@ -49,6 +57,10 @@ const config = {
   },
 
   production: {
+    webServer: {
+      port: process.env.PORT,
+    },
+
     scheduleUsageAnalysis: {
       usageAnalysisPeriod: 900000,
       secondsOfMinute: 0,
