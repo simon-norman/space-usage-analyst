@@ -3,7 +3,6 @@ const sinon = require('sinon');
 const chai = require('chai');
 const sinonChai = require('sinon-chai');
 const stampit = require('stampit');
-const parseFunctionArgs = require('parse-fn-args');
 
 chai.use(sinonChai);
 const { expect } = chai;
