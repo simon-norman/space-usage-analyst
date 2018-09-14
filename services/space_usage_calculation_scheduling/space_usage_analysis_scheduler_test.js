@@ -22,8 +22,6 @@ describe('space_usage_analysis_scheduler', () => {
     mockDatetimeFunctionScheduled = new Date('December 17, 1995 00:00:00');
     scheduleFunctionSpy = sinon.spy();
     mockFunctionScheduler = stampit({
-      init(somestuff) {
-      },
       methods: {
         scheduleFunction(params) {
           scheduleFunctionSpy(params);
@@ -48,16 +46,6 @@ describe('space_usage_analysis_scheduler', () => {
       mockFunctionScheduler,
       mockWifiRecordingsSpaceUsageCalculator,
     );
-
-    const other = stampit({
-      init(otherstuff) {
-      },
-    });
-    const newstuff = other.compose(mockFunctionScheduler);
-
-    const exfunction = newstuff.compose.initializers[0];
-
-    const theargs = parseFunctionArgs(exfunction);
 
     spaceUsageAnalysisScheduler = SpaceUsageAnalysisSchedulerStamp();
   };
