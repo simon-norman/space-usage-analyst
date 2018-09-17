@@ -75,7 +75,7 @@ describe('recordings_for_site_getter', function () {
         startTime: getAllRecordingsByTimeframeParams.startTime,
         endTime: getAllRecordingsByTimeframeParams.endTime,
         recordings: mockRecordings,
-      },
+      }
     ];
   };
 
@@ -128,6 +128,29 @@ describe('recordings_for_site_getter', function () {
   });
 
   describe('error handling', function () {
+    let getRecordingsErrorResponse;
+
+    const getErrorFromFailingGetRecordingsPromise = async () => {
+      try {
+        return await allRecordingsByTimeframeGetter
+          .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+      } catch (error) {
+        return error;
+      }
+    };
+
+    before(() => {
+      getRecordingsErrorResponse = {
+        response: {
+          status: '',
+          data: {
+            error: {
+              message: '',
+            },
+          },
+        },
+      };
+    });
     it('should log exception without throwing error further if 404 returned by spaces call', async function () {
       const noSpacesFoundResponse = {
         response: {
@@ -155,18 +178,23 @@ describe('recordings_for_site_getter', function () {
     });
 
     it('should log exception without throwing error further if 404 returned by get recordings call', async function () {
-      const noRecordingsFoundResponse = {
-        response: {
-          status: 404,
-          message: 'No recordings found',
-        },
-      };
-      stubbedGetRecordings.returns(Promise.reject(noRecordingsFoundResponse));
+      getRecordingsErrorResponse.response.data.error.message = 'No recordings found';
+      getRecordingsErrorResponse.response.status = 404;
+      stubbedGetRecordings.returns(Promise.reject(getRecordingsErrorResponse));
 
       await allRecordingsByTimeframeGetter
         .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
 
       expect(logExceptionSpy.firstCall.args[0].message).equals('No recordings found');
+    });
+
+    it('should throw error if other error thrown by recordings api, capturing the error info passed by recordings api', async function () {
+      getRecordingsErrorResponse.response.data.error.message = 'Incorrect parameters passed';
+      getRecordingsErrorResponse.response.status = 422;
+      stubbedGetRecordings.returns(Promise.reject(getRecordingsErrorResponse));
+
+      const thrownError = await getErrorFromFailingGetRecordingsPromise();
+      expect(thrownError.message).equals('Incorrect parameters passed');
     });
 
     it('should throw error if any other error thrown during get recordings call', async function () {

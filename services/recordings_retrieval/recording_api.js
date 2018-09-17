@@ -15,14 +15,14 @@ module.exports = (RetryEnabledApiStamp) => {
   checkStampFactoryArgumentsValid(RetryEnabledApiStamp);
   const RecordingApiStamp = stampit({
     props: {
-      baseRecordingsPath: '/recordings/',
+      baseRecordingsPath: '/recordings',
     },
 
     methods: {
       getRecordings(recordingsCallParams) {
         return this.get(
           this.baseRecordingsPath,
-          { params: recordingsCallParams },
+          { params: recordingsCallParams }
         );
       },
     },

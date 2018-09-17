@@ -67,11 +67,15 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
             resolve();
           } catch (error) {
             if (error.response && error.response.status === 404) {
-              const recordingsNotFoundError = new AxiosError('No recordings found', error);
+              const recordingsNotFoundError
+                = new AxiosError(error.response.data.error.message, error);
               this.logException(recordingsNotFoundError);
               resolve();
+            } else if (error.response) {
+              const axiosError = new AxiosError(error.response.data.error.message, error);
+              reject(axiosError);
             }
-            reject(new AxiosError(error));
+            reject(error);
           }
         });
       },

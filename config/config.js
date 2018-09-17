@@ -11,10 +11,10 @@ const config = {
     },
 
     spaceUsageApi: {
-      baseUrl: 'localhost:3000',
+      baseUrl: 'http://localhost:3001',
     },
     recordingApi: {
-      baseUrl: 'localhost:3001',
+      baseUrl: 'http://localhost:3000',
     },
   },
 
