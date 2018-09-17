@@ -17,7 +17,7 @@ module.exports = (RetryEnabledApiStamp) => {
       saveSpaceUsage(spaceUsage) {
         return this.post(
           this.baseSpaceUsagePath,
-          spaceUsage,
+          spaceUsage
         );
       },
     },

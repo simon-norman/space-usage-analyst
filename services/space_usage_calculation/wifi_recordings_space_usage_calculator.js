@@ -15,7 +15,10 @@ module.exports = (
 
   methods: {
     calculateSpaceUsage(usagePeriodStartEndTimes) {
-      this.recordingsGetter.on('recordings-by-space-timeframe', this.calculateSpaceUsageForUsagePeriod);
+      this.boundCalculateSpaceUsageForUsagePeriod
+        = this.calculateSpaceUsageForUsagePeriod.bind(this);
+
+      this.recordingsGetter.on('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
       this.recordingsGetter.getAllRecordingsByTimeframe(usagePeriodStartEndTimes);
     },
 
@@ -31,7 +34,7 @@ module.exports = (
         spaceId,
         usagePeriodStartTime: startTime,
         usagePeriodEndTime: endTime,
-        dedupedWifiRecordings,
+        recordings: dedupedWifiRecordings,
       });
 
       this.saveSpaceUsage(spaceUsage);
@@ -43,13 +46,14 @@ module.exports = (
       usagePeriodEndTime,
       recordings,
     }) {
-      const noPeopleInUsagePeriodCalculator = NoPeopleInUsagePeriodCalculatorStamp({
+      const noPeopleInUsagePeriodCalculator = this.NoPeopleInUsagePeriodCalculatorStamp({
         usagePeriodStartTime,
         usagePeriodEndTime,
         snapshotLengthInMilliseconds: 900000,
       });
 
-      const noPeopleInUsagePeriod = noPeopleInUsagePeriodCalculator.calculateSpaceUsage(recordings);
+      const noPeopleInUsagePeriod
+        = noPeopleInUsagePeriodCalculator.calculateNoOfPeopleInUsagePeriod(recordings);
 
       return {
         spaceId,
