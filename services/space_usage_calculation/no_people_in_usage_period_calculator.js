@@ -58,8 +58,9 @@ module.exports = () => stampit({
     },
 
     calculateSnapshotTimeOfRecording(recording) {
+      const timestampRecordedAsUnixEpoch = new Date(recording.timestampRecorded).getTime();
       const diffBetweenRecordingTimeUsagePeriodStartTime
-        = recording.timestampRecorded - this.usagePeriodStartTime;
+        = timestampRecordedAsUnixEpoch - this.usagePeriodStartTime;
 
       const indexOfSnapshot = Math.floor(diffBetweenRecordingTimeUsagePeriodStartTime /
         this.snapshotLengthInMilliseconds);
