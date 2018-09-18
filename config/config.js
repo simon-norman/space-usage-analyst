@@ -8,6 +8,7 @@ const config = {
     scheduleUsageAnalysis: {
       usageAnalysisPeriod: 900000,
       secondsOfMinute: Array.apply(null, { length: 60 }).map(Number.call, Number),
+      avgIntervalPeriodThatDeviceDetected: 900000,
     },
 
     spaceUsageApi: {

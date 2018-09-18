@@ -16,6 +16,7 @@ describe('space_usage_analysis_scheduler', () => {
   let calculateSpaceUsageSpy;
   let mockWifiRecordingsSpaceUsageCalculator;
   let spaceUsageAnalysisScheduler;
+  let expectedUsageAnalysisConfig;
 
   const setUpMockFunctionScheduler = () => {
     mockDatetimeFunctionScheduled = new Date('December 17, 1995 00:00:00');
@@ -50,17 +51,31 @@ describe('space_usage_analysis_scheduler', () => {
   };
 
   const scheduleUsageAnalysisParams = {
+    avgIntervalPeriodThatDeviceDetected: 900000,
     usageAnalysisPeriod: 900000,
     secondsOfMinute: 30,
     minutesOfHour: [0, 15, 30, 45],
     hoursOfDay: 12,
   };
 
+  const setUpExpectedUsageAnalysisConfig = () => {
+    const startTime = mockDatetimeFunctionScheduled.getTime() -
+      scheduleUsageAnalysisParams.usageAnalysisPeriod;
+
+    expectedUsageAnalysisConfig = {
+      endTime: mockDatetimeFunctionScheduled.getTime(),
+      startTime,
+      avgIntervalPeriodThatDeviceDetected:
+        scheduleUsageAnalysisParams.avgIntervalPeriodThatDeviceDetected,
+    };
+  };
 
   beforeEach(() => {
     setUpMockFunctionScheduler();
 
     setUpSpaceUsageAnalysisScheduler();
+
+    setUpExpectedUsageAnalysisConfig();
   });
 
   it('should create schedule to calculate the space usage at the specified times', () => {
@@ -75,11 +90,8 @@ describe('space_usage_analysis_scheduler', () => {
     expect(scheduleFunctionSpy.firstCall.args[0].secondsOfMinute)
       .equals(scheduleUsageAnalysisParams.secondsOfMinute);
 
-    expect(calculateSpaceUsageSpy).always.have.been.calledOnceWithExactly({
-      endTime: mockDatetimeFunctionScheduled.getTime(),
-      startTime: mockDatetimeFunctionScheduled.getTime() -
-          scheduleUsageAnalysisParams.usageAnalysisPeriod,
-    });
+    expect(calculateSpaceUsageSpy)
+      .always.have.been.calledOnceWithExactly(expectedUsageAnalysisConfig);
   });
 });
 

@@ -11,17 +11,19 @@ module.exports = (FunctionSchedulerStamp, wifiRecordingsSpaceUsageCalculator) =>
     methods: {
       scheduleUsageAnalysis({
         usageAnalysisPeriod,
+        avgIntervalPeriodThatDeviceDetected,
         secondsOfMinute,
         minutesOfHour,
         hoursOfDay,
       }) {
         const scheduledCalculateSpaceUsage = (datetimeFunctionScheduled) => {
-          const usagePeriodStartEndTimes = {
+          const usageAnalysisConfig = {
             startTime: datetimeFunctionScheduled.getTime() - usageAnalysisPeriod,
             endTime: datetimeFunctionScheduled.getTime(),
+            avgIntervalPeriodThatDeviceDetected,
           };
 
-          this.wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(usagePeriodStartEndTimes);
+          this.wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(usageAnalysisConfig);
         };
 
         this.scheduleFunction({

@@ -14,12 +14,15 @@ module.exports = (
   },
 
   methods: {
-    calculateSpaceUsage(usagePeriodStartEndTimes) {
+    calculateSpaceUsage({ startTime, endTime, avgIntervalPeriodThatDeviceDetected }) {
+      this.avgIntervalPeriodThatDeviceDetected
+        = avgIntervalPeriodThatDeviceDetected;
+
       this.boundCalculateSpaceUsageForUsagePeriod
         = this.calculateSpaceUsageForUsagePeriod.bind(this);
 
       this.recordingsGetter.on('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
-      this.recordingsGetter.getAllRecordingsByTimeframe(usagePeriodStartEndTimes);
+      this.recordingsGetter.getAllRecordingsByTimeframe({ startTime, endTime });
     },
 
     calculateSpaceUsageForUsagePeriod({
@@ -49,7 +52,7 @@ module.exports = (
       const noPeopleInUsagePeriodCalculator = this.NoPeopleInUsagePeriodCalculatorStamp({
         usagePeriodStartTime,
         usagePeriodEndTime,
-        snapshotLengthInMilliseconds: 900000,
+        snapshotLengthInMilliseconds: this.avgIntervalPeriodThatDeviceDetected,
       });
 
       const noPeopleInUsagePeriod
