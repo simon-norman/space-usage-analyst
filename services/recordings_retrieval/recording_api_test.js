@@ -51,7 +51,7 @@ describe('recording_api', () => {
       await recordingApi.getRecordings(recordingsCallParams);
 
       expect(getStub.calledWithExactly(
-        '/recordings/',
+        '/recordings',
         {
           params: {
             startTime: recordingsCallParams.startTime,
