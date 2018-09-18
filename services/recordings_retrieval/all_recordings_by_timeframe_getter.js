@@ -33,12 +33,17 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
       },
 
       createGetSpacesError(error) {
+        let configuredError = error;
+
         if (error.response && error.response.status === 404) {
-          const spacesNotFoundError = new AxiosError('No spaces found', error);
-          spacesNotFoundError.isRecoverable = true;
-          return spacesNotFoundError;
+          configuredError = new AxiosError('No spaces found', error);
+          configuredError.isRecoverable = true;
+        } else if (error.response) {
+          configuredError = new AxiosError(error.response.data.error.message, error);
+          configuredError.isRecoverable = false;
         }
-        return error;
+
+        return configuredError;
       },
 
       getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime }) {
@@ -66,16 +71,7 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
             this.emitRecordings(recordings, paramsToGetRecordings);
             resolve();
           } catch (error) {
-            if (error.response && error.response.status === 404) {
-              const recordingsNotFoundError
-                = new AxiosError(error.response.data.error.message, error);
-              this.logException(recordingsNotFoundError);
-              resolve();
-            } else if (error.response) {
-              const axiosError = new AxiosError(error.response.data.error.message, error);
-              reject(axiosError);
-            }
-            reject(error);
+            this.handleGetRecordingsForSingleSpaceError(error, resolve, reject);
           }
         });
       },
@@ -94,6 +90,21 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         };
 
         this.emit('recordings-by-space-timeframe', recordingsBySpaceIdAndTimeframe);
+      },
+
+      handleGetRecordingsForSingleSpaceError(error, resolve, reject) {
+        if (error.response && error.response.status === 404) {
+          const recordingsNotFoundError
+            = new AxiosError(error.response.data.error.message, error);
+
+          this.logException(recordingsNotFoundError);
+          resolve();
+        } else if (error.response) {
+          const axiosError = new AxiosError(error.response.data.error.message, error);
+          reject(axiosError);
+        }
+
+        reject(error);
       },
 
       handleGetAllRecordingsError(error) {

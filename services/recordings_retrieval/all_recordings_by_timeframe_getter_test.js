@@ -128,7 +128,7 @@ describe('recordings_for_site_getter', function () {
   });
 
   describe('error handling', function () {
-    let getRecordingsErrorResponse;
+    let axiosHttpErrorResponse;
 
     const getErrorFromFailingGetRecordingsPromise = async () => {
       try {
@@ -139,8 +139,8 @@ describe('recordings_for_site_getter', function () {
       }
     };
 
-    before(() => {
-      getRecordingsErrorResponse = {
+    const setUpAxiosHttpErrorResponse = () => {
+      axiosHttpErrorResponse = {
         response: {
           status: '',
           data: {
@@ -150,15 +150,15 @@ describe('recordings_for_site_getter', function () {
           },
         },
       };
+    };
+
+    beforeEach(() => {
+      setUpAxiosHttpErrorResponse();
     });
+
     it('should log exception without throwing error further if 404 returned by spaces call', async function () {
-      const noSpacesFoundResponse = {
-        response: {
-          status: 404,
-          message: 'No spaces found',
-        },
-      };
-      stubbedGetSpaces.returns(Promise.reject(noSpacesFoundResponse));
+      axiosHttpErrorResponse.response.status = 404;
+      stubbedGetSpaces.returns(Promise.reject(axiosHttpErrorResponse));
 
       await allRecordingsByTimeframeGetter
         .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
@@ -166,21 +166,22 @@ describe('recordings_for_site_getter', function () {
       expect(logExceptionSpy.firstCall.args[0].message).equals('No spaces found');
     });
 
-    it('should throw error if any other error thrown during get spaces call', async function () {
-      const someError = new Error('some error');
-      stubbedGetSpaces.returns(Promise.reject(someError));
+    it('should throw error, capturing message from server, if any other error thrown during get spaces call', async function () {
+      const errorMessage = 'Unauthorized';
+      axiosHttpErrorResponse.response.data.error.message = errorMessage;
+      axiosHttpErrorResponse.response.status = 403;
 
-      const promiseToGetRecordings =
-        allRecordingsByTimeframeGetter
-          .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
+      stubbedGetSpaces.returns(Promise.reject(axiosHttpErrorResponse));
 
-      expect(promiseToGetRecordings).to.be.rejected;
+      const thrownError = await getErrorFromFailingGetRecordingsPromise();
+
+      expect(thrownError.message).equals(errorMessage);
     });
 
     it('should log exception without throwing error further if 404 returned by get recordings call', async function () {
-      getRecordingsErrorResponse.response.data.error.message = 'No recordings found';
-      getRecordingsErrorResponse.response.status = 404;
-      stubbedGetRecordings.returns(Promise.reject(getRecordingsErrorResponse));
+      axiosHttpErrorResponse.response.data.error.message = 'No recordings found';
+      axiosHttpErrorResponse.response.status = 404;
+      stubbedGetRecordings.returns(Promise.reject(axiosHttpErrorResponse));
 
       await allRecordingsByTimeframeGetter
         .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
@@ -189,11 +190,12 @@ describe('recordings_for_site_getter', function () {
     });
 
     it('should throw error if other error thrown by recordings api, capturing the error info passed by recordings api', async function () {
-      getRecordingsErrorResponse.response.data.error.message = 'Incorrect parameters passed';
-      getRecordingsErrorResponse.response.status = 422;
-      stubbedGetRecordings.returns(Promise.reject(getRecordingsErrorResponse));
+      axiosHttpErrorResponse.response.data.error.message = 'Incorrect parameters passed';
+      axiosHttpErrorResponse.response.status = 422;
+      stubbedGetRecordings.returns(Promise.reject(axiosHttpErrorResponse));
 
       const thrownError = await getErrorFromFailingGetRecordingsPromise();
+
       expect(thrownError.message).equals('Incorrect parameters passed');
     });
 
