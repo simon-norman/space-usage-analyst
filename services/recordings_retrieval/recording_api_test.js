@@ -5,7 +5,6 @@ const stampit = require('stampit');
 
 const RecordingApiStampFactory = require('./recording_api.js');
 
-
 describe('recording_api', () => {
   let mockRecordings;
   let getStub;
