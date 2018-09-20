@@ -276,7 +276,7 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "Space usage analysis integration tests",
+        "name": "Calculate space usage",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
             "-u",
@@ -284,7 +284,7 @@
             "--timeout",
             "999999",
             "--colors",
-            "./{,!(node_modules)/**/}*space_usage_integration_test.js"
+            "./{,!(node_modules)/**/}*calculate_space_usage_test.js"
         ],
         "internalConsoleOptions": "openOnSessionStart"
     },
