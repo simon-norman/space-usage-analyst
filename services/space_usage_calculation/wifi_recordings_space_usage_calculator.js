@@ -21,8 +21,11 @@ module.exports = (
 
       this.boundCalculateSpaceUsageForUsagePeriod
         = this.calculateSpaceUsageForUsagePeriod.bind(this);
-
       this.recordingsGetter.on('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
+
+      allRecordingsByTimeframeGetter.on('all-recordings-retrieved', () => {
+        this.recordingsGetter.off('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
+      });
       this.recordingsGetter.getAllRecordingsByTimeframe({ startTime, endTime });
     },
 

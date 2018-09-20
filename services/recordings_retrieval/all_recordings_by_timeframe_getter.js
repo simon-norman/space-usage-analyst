@@ -18,6 +18,7 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
             = this.getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime });
 
           await Promise.all(allPromisesToGetThenEmitRecordings);
+          this.emit('all-recordings-retrieved');
         } catch (error) {
           this.handleGetAllRecordingsError(error);
         }
