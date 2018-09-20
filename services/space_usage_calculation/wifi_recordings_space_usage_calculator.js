@@ -19,13 +19,14 @@ module.exports = (
       this.avgIntervalPeriodThatDeviceDetected
         = avgIntervalPeriodThatDeviceDetected;
 
-      this.boundCalculateSpaceUsageForUsagePeriod
+      const boundCalculateSpaceUsageForUsagePeriod
         = this.calculateSpaceUsageForUsagePeriod.bind(this);
-      this.recordingsGetter.on('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
+      this.recordingsGetter.on('recordings-by-space-timeframe', boundCalculateSpaceUsageForUsagePeriod);
 
       allRecordingsByTimeframeGetter.on('all-recordings-retrieved', () => {
-        this.recordingsGetter.removeListener('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
+        this.recordingsGetter.removeAllListeners('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
       });
+
       this.recordingsGetter.getAllRecordingsByTimeframe({ startTime, endTime });
     },
 
