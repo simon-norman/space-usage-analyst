@@ -11,6 +11,8 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('Calculate space usage', function () {
+  let wifiRecordingsSpaceUsageCalculator;
+
   const setPromisifiedTimeout = timeoutPeriodInMilliseconds => new Promise((resolve) => {
     setTimeout(() => {
       resolve();
@@ -18,51 +20,53 @@ describe('Calculate space usage', function () {
   });
 
   const setUpMockGetSpacesApiCall = () => {
-    mockAxios.onGet('/spaces/').reply(200, [
+    const mockSpaces = [
       { spaceId: '1' },
       { spaceId: '2' }
-    ]);
+    ];
+
+    mockAxios.onGet('/spaces/').reply(200, mockSpaces);
   };
 
   const setUpMockGetRecordingsApiCall = () => {
-    mockAxios.onGet('/recordings').reply(200, [
+    const mockRecordings = [
       { timestampRecorded: new Date('December 10, 2000 00:00:01'), objectId: 1 },
-      { timestampRecorded: new Date('December 10, 2000 00:01:01'), objectId: 2 },
+      { timestampRecorded: new Date('December 10, 2000 00:01:01'), objectId: 1 },
       { timestampRecorded: new Date('December 10, 2000 00:04:01'), objectId: 2 },
-      { timestampRecorded: new Date('December 10, 2000 00:07:31'), objectId: 3 },
-      { timestampRecorded: new Date('December 10, 2000 00:09:31'), objectId: 3 },
-      { timestampRecorded: new Date('December 10, 2000 00:11:11'), objectId: 3 }
-    ]);
+      { timestampRecorded: new Date('December 10, 2000 00:04:01'), objectId: 2 }
+    ];
+
+    mockAxios.onGet('/recordings').reply(200, mockRecordings);
   };
 
-  const calculateSpaceUsage = () => {
+  const setUpWifiRecordingsSpaceUsageCalculator = () => {
     const { wireUpApp } = require('../dependency_injection/app_wiring');
     const diContainer = wireUpApp();
-    const wifiRecordingsSpaceUsageCalculator = diContainer.getDependency('wifiRecordingsSpaceUsageCalculator');
+    wifiRecordingsSpaceUsageCalculator = diContainer.getDependency('wifiRecordingsSpaceUsageCalculator');
+  };
 
-    const startTime = new Date('December 10, 2000 00:00:00').getTime();
-    const endTime = new Date('December 10, 2000 00:15:00').getTime();
-    const avgIntervalPeriodThatDeviceDetectedInMils = 15 * 60 * 1000;
-
-    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage({
-      startTime,
-      endTime,
-      avgIntervalPeriodThatDeviceDetected: avgIntervalPeriodThatDeviceDetectedInMils,
-    });
+  const calculateSpaceUsageParams = {
+    startTime: new Date('December 10, 2000 00:00:00').getTime(),
+    endTime: new Date('December 10, 2000 00:15:00').getTime(),
+    avgIntervalPeriodThatDeviceDetected: 15 * 60 * 1000,
   };
 
   const expectedSpaceUsageToBeCalculated = {
-    numberOfPeopleRecorded: 3,
+    numberOfPeopleRecorded: 2,
     usagePeriodEndTime: 976407300000,
     usagePeriodStartTime: 976406400000,
   };
 
-  it('should calculate, for the specified timeframe, the space usage for each area', async function () {
+  before(() => {
     setUpMockGetSpacesApiCall();
     setUpMockGetRecordingsApiCall();
     mockAxios.onPost('/spaceUsage/').reply(200);
 
-    calculateSpaceUsage();
+    setUpWifiRecordingsSpaceUsageCalculator();
+  });
+
+  it('should calculate, for the specified timeframe, the space usage for each area', async function () {
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
     await setPromisifiedTimeout(1);
 
