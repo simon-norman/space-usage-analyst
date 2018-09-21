@@ -4,7 +4,7 @@ const DependencyAlreadyRegisteredError = require('../services/error_handling/err
 const DiContainerStampFactory = require('./di_container');
 const DiContainerInclStampsStampFactory = require('./di_container_incl_stamps');
 const { getConfigForEnvironment } = require('../config/config.js');
-const LoggerFactory = require('../services/error_handling/logger/logger.js');
+const RavenWrapperFactory = require('raven-wrapper');
 const RetryEnabledApiStampFactory = require('../services/base_api/retry_enabled_api');
 const BaseApiStampFactory = require('../services/base_api/base_api');
 const EventEmittableStamp = require('../services/event_generation/event_emittable_stamp');
@@ -113,7 +113,10 @@ const registerSpaceUsageCalculationScheduling = () => {
 const wireUpApp = () => {
   setUpDiContainer();
 
-  const { logException } = LoggerFactory(process.env.NODE_ENV);
+  const errorLoggingConfig = getConfigForEnvironment(process.env.NODE_ENV).errorLogging;
+  errorLoggingConfig.environment = process.env.NODE_ENV;
+  const { logException } = RavenWrapperFactory(errorLoggingConfig);
+
   registerDependency('logException', logException);
 
   registerApis();
