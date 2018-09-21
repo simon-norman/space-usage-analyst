@@ -1,7 +1,7 @@
 
 const { wireUpApp } = require('./dependency_injection/app_wiring');
 const { getConfigForEnvironment } = require('./config/config.js');
-const LoggerFactory = require('./services/error_handling/logger/logger.js');
+const RavenWrapperFactory = require('raven-wrapper');
 const express = require('express');
 
 let config;
@@ -28,7 +28,10 @@ const startApp = async () => {
   spaceUsageAnalysisScheduler.scheduleUsageAnalysis(scheduleUsageAnalysisConfig);
 };
 
-const { wrapperToHandleUnhandledExceptions } = LoggerFactory(process.env.NODE_ENV);
+const errorLoggingConfig = getConfigForEnvironment(process.env.NODE_ENV).errorLogging;
+errorLoggingConfig.environment = process.env.NODE_ENV;
+const { wrapperToHandleUnhandledExceptions } = RavenWrapperFactory(errorLoggingConfig);
+
 wrapperToHandleUnhandledExceptions(() => {
   startApp();
 });

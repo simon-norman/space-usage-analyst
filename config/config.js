@@ -1,3 +1,4 @@
+/* eslint prefer-spread: "off" */
 
 const config = {
   development: {
@@ -14,8 +15,19 @@ const config = {
     spaceUsageApi: {
       baseUrl: 'http://localhost:3001',
     },
+
     recordingApi: {
       baseUrl: 'http://localhost:3000',
+    },
+
+    errorLogging: {
+      environment: '',
+      ravenConfig: [
+        process.env.RAVEN_DSN,
+        {
+          captureUnhandledRejections: true,
+        }
+      ],
     },
   },
 
@@ -33,8 +45,19 @@ const config = {
     spaceUsageApi: {
       baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
     },
+
     recordingApi: {
       baseUrl: process.env.RECORDING_API_BASE_URL,
+    },
+
+    errorLogging: {
+      environment: '',
+      ravenConfig: [
+        process.env.RAVEN_DSN,
+        {
+          captureUnhandledRejections: true,
+        }
+      ],
     },
   },
 
@@ -52,8 +75,19 @@ const config = {
     spaceUsageApi: {
       baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
     },
+
     recordingApi: {
       baseUrl: process.env.RECORDING_API_BASE_URL,
+    },
+
+    errorLogging: {
+      environment: '',
+      ravenConfig: [
+        process.env.RAVEN_DSN,
+        {
+          captureUnhandledRejections: true,
+        }
+      ],
     },
   },
 
@@ -71,8 +105,19 @@ const config = {
     spaceUsageApi: {
       baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
     },
+
     recordingApi: {
       baseUrl: process.env.RECORDING_API_BASE_URL,
+    },
+
+    errorLogging: {
+      environment: '',
+      ravenConfig: [
+        process.env.RAVEN_DSN,
+        {
+          captureUnhandledRejections: true,
+        }
+      ],
     },
   },
 };
