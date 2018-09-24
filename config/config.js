@@ -40,6 +40,7 @@ const config = {
       usageAnalysisPeriod: 900000,
       secondsOfMinute: 0,
       minutesOfHour: [0, 15, 30, 45],
+      avgIntervalPeriodThatDeviceDetected: 900000,
     },
 
     spaceUsageApi: {
@@ -70,6 +71,7 @@ const config = {
       usageAnalysisPeriod: 900000,
       secondsOfMinute: 0,
       minutesOfHour: [0, 15, 30, 45],
+      avgIntervalPeriodThatDeviceDetected: 900000,
     },
 
     spaceUsageApi: {
@@ -100,6 +102,7 @@ const config = {
       usageAnalysisPeriod: 900000,
       secondsOfMinute: 0,
       minutesOfHour: [0, 15, 30, 45],
+      avgIntervalPeriodThatDeviceDetected: 900000,
     },
 
     spaceUsageApi: {
