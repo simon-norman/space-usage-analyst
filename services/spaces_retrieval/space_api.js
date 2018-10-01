@@ -22,7 +22,7 @@ module.exports = (BaseApiStamp, checkIfSuccessfulGraphqlResponseHasNestedError) 
             const response = await this.makeGetAllSpacesCall();
             this.checkIfSuccessfulGraphqlResponseHasNestedError(response);
 
-            resolve(response.data.data.GetAllSpaces);
+            resolve({ data: response.data.data.GetAllSpaces });
           } catch (error) {
             reject(error);
           }

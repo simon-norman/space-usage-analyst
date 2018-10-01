@@ -70,11 +70,11 @@ describe('space_api', () => {
         occupancyCapacity
       }}`;
 
-      const returnedSpaces = await spaceApi.getSpaces();
+      const getSpacesResponse = await spaceApi.getSpaces();
 
       expect(postStub.args[0][0]).equals('/');
       expect(postStub.args[0][1].query).equalIgnoreSpaces(expectedGetAllSpacesQueryString);
-      expect(returnedSpaces).to.equal(mockSpaces);
+      expect(getSpacesResponse).deep.equals({ data: mockSpaces });
     });
 
     it('should return a failing promise with error if get spaces response is an HTTP error thrown by server', async () => {
