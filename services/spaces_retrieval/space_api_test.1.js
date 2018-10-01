@@ -16,7 +16,6 @@ describe('space_api', () => {
 
     try {
       const response = await spaceApi.getSpaces({
-        spaceId: '1',
         usagePeriodEndTime: new Date('October 10, 2010 11:15:00').getTime(),
         usagePeriodStartTime: new Date('October 10, 2010 11:00:00').getTime(),
         numberOfPeopleRecorded: 3,

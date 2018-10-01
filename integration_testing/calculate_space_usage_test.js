@@ -19,13 +19,27 @@ describe('Calculate space usage', function () {
     }, timeoutPeriodInMilliseconds);
   });
 
-  const setUpMockGetSpacesApiCall = () => {
+  const setUpMockSpaceAndSpaceUsageApiCalls = () => {
     const mockSpaces = [
       { spaceId: '1' },
       { spaceId: '2' }
     ];
 
-    mockAxios.onGet('/spaces/').reply(200, mockSpaces);
+    const mockSuccessfulGetSpacesResponse = {
+      data: {
+        GetAllSpaces: mockSpaces,
+      },
+    };
+
+    const mockSuccessfulSaveSpaceUsageResponse = {
+      data: {
+        CreateSpaceUsage: 'saved space usage data',
+      },
+    };
+
+    mockAxios
+      .onPost('/').replyOnce(200, mockSuccessfulGetSpacesResponse)
+      .onPost('/').reply(200, mockSuccessfulSaveSpaceUsageResponse);
   };
 
   const setUpMockGetRecordingsApiCall = () => {
@@ -58,9 +72,8 @@ describe('Calculate space usage', function () {
   };
 
   before(() => {
-    setUpMockGetSpacesApiCall();
+    setUpMockSpaceAndSpaceUsageApiCalls();
     setUpMockGetRecordingsApiCall();
-    mockAxios.onPost('/spaceUsage/').reply(200);
 
     setUpWifiRecordingsSpaceUsageCalculator();
   });
@@ -70,10 +83,12 @@ describe('Calculate space usage', function () {
 
     await setPromisifiedTimeout(1);
 
-    const firstSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[0].data);
-    expect(firstSpaceUsagePostedToMockSpaceUsageApi).deep.equals(expectedSpaceUsageToBeCalculated);
+    const firstSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[1].data);
+    expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
+      .deep.equals(expectedSpaceUsageToBeCalculated);
 
-    const secondSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[0].data);
-    expect(secondSpaceUsagePostedToMockSpaceUsageApi).deep.equals(expectedSpaceUsageToBeCalculated);
+    const secondSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[2].data);
+    expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
+      .deep.equals(expectedSpaceUsageToBeCalculated);
   });
 });
