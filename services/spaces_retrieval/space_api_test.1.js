@@ -14,7 +14,7 @@ describe('space_api', () => {
     const SpaceApiStamp = SpaceApiStampFactory(BaseApiStamp);
     const spaceApi = SpaceApiStamp({
       apiConfig: {
-        baseUrl: 'http://localhost:4000',
+        baseUrl: 'http://localhost:4000/graphqll',
       },
     });
 
