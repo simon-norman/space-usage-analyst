@@ -151,7 +151,7 @@ describe('recordings_for_site_getter', function () {
       }
     };
 
-    const setUpAxiosHttpErrorResponse = () => {
+    const setUpGetSpacesErrorResponse = () => {
       axiosHttpErrorResponse = {
         response: {
           status: '',
@@ -165,12 +165,12 @@ describe('recordings_for_site_getter', function () {
     };
 
     beforeEach(() => {
-      setUpAxiosHttpErrorResponse();
+      setUpGetSpacesErrorResponse();
     });
 
-    it('should log exception without throwing error further if 404 returned by spaces call', async function () {
-      axiosHttpErrorResponse.response.status = 404;
-      stubbedGetSpaces.returns(Promise.reject(axiosHttpErrorResponse));
+    it('should log exception without throwing error further if no spaces error returned by spaces call', async function () {
+      const getSpacesError = new Error('No spaces found');
+      stubbedGetSpaces.returns(Promise.reject(getSpacesError));
 
       await allRecordingsByTimeframeGetter
         .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
@@ -179,15 +179,12 @@ describe('recordings_for_site_getter', function () {
     });
 
     it('should throw error, capturing message from server, if any other error thrown during get spaces call', async function () {
-      const errorMessage = 'Unauthorized';
-      axiosHttpErrorResponse.response.data.error.message = errorMessage;
-      axiosHttpErrorResponse.response.status = 403;
-
-      stubbedGetSpaces.returns(Promise.reject(axiosHttpErrorResponse));
+      const getSpacesError = new Error('Some other error');
+      stubbedGetSpaces.returns(Promise.reject(getSpacesError));
 
       const thrownError = await getErrorFromFailingGetRecordingsPromise();
 
-      expect(thrownError.message).equals(errorMessage);
+      expect(thrownError.message).equals('Some other error');
     });
 
     it('should log exception without throwing error further if 404 returned by get recordings call', async function () {

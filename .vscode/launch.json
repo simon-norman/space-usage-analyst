@@ -171,6 +171,21 @@
     {
         "type": "node",
         "request": "launch",
+        "name": "api space usage tests",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*space_api_test.1.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
         "name": "space usage api tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
