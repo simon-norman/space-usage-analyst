@@ -1,15 +1,10 @@
 const stampit = require('stampit');
 
-const checkStampFactoryArgumentsValid = (RetryEnabledApiStamp) => {
-  if (!RetryEnabledApiStamp) {
-    throw new Error('Retry Enabled Stamp not provided to Api stamp factory');
-  }
-};
-
-module.exports = (RetryEnabledApiStamp) => {
-  checkStampFactoryArgumentsValid(RetryEnabledApiStamp);
+module.exports = (RetryEnabledApiStamp, checkIfSuccessfulGraphqlResponseHasNestedError) => {
   const RecordingApiStamp = stampit({
     props: {
+      checkIfSuccessfulGraphqlResponseHasNestedError,
+
       baseSpaceUsagePath: '/',
 
       saveSpaceUsageQueryString: `mutation CreateSpaceUsage($input: SpaceUsageInput) {
@@ -28,7 +23,7 @@ module.exports = (RetryEnabledApiStamp) => {
         return new Promise(async (resolve, reject) => {
           try {
             const response = await this.makeSaveSpaceUsageCall(spaceUsage);
-            this.checkIfSuccessfulResponseHasNestedError(response);
+            this.checkIfSuccessfulGraphqlResponseHasNestedError(response);
 
             resolve(response.data.data.CreateSpaceUsage);
           } catch (error) {
@@ -46,15 +41,8 @@ module.exports = (RetryEnabledApiStamp) => {
           },
         );
       },
-
-      checkIfSuccessfulResponseHasNestedError(response) {
-        if (response.data.errors && response.data.errors.length > 0) {
-          const nestedError = new Error(response.data.errors[0].message);
-          nestedError.errorDetail = response;
-          throw nestedError;
-        }
-      },
     },
   });
+
   return RecordingApiStamp.compose(RetryEnabledApiStamp);
 };

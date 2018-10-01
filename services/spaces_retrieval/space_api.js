@@ -1,23 +1,40 @@
+
 const stampit = require('stampit');
 
-const checkStampFactoryArgumentsValid = (BaseApiStamp) => {
-  if (!BaseApiStamp) {
-    throw new Error('Base Api Stamp not provided to Api stamp factory');
-  }
-};
-
-module.exports = (BaseApiStamp) => {
-  checkStampFactoryArgumentsValid(BaseApiStamp);
+module.exports = (BaseApiStamp, checkIfSuccessfulGraphqlResponseHasNestedError) => {
   const SpaceApiStamp = stampit({
     props: {
-      baseSpacesPath: '/spaces/',
+      checkIfSuccessfulGraphqlResponseHasNestedError,
+
+      baseSpacesPath: '/',
+
+      getAllSpacesQueryString: `{ GetAllSpaces {
+        _id
+        name
+        occupancyCapacity
+      }}`,
     },
 
     methods: {
-      getSpaces(spacesCallParams) {
-        return this.get(
+      getSpaces() {
+        return new Promise(async (resolve, reject) => {
+          try {
+            const response = await this.makeGetAllSpacesCall();
+            this.checkIfSuccessfulGraphqlResponseHasNestedError(response);
+
+            resolve(response.data.data.GetAllSpaces);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+
+      makeGetAllSpacesCall() {
+        return this.post(
           this.baseSpacesPath,
-          { params: spacesCallParams },
+          {
+            query: this.getAllSpacesQueryString,
+          },
         );
       },
     },
