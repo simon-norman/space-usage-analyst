@@ -1,5 +1,4 @@
 const stampit = require('stampit');
-const AxiosError = require('axios-error');
 
 module.exports = (
   wifiRecordingsDeduplicator,
@@ -74,15 +73,8 @@ module.exports = (
     saveSpaceUsage(spaceUsage) {
       this.spaceUsageApi.saveSpaceUsage(spaceUsage)
         .catch((error) => {
-          throw this.createSaveSpaceUsageError(error);
+          throw error;
         });
-    },
-
-    createSaveSpaceUsageError(error) {
-      if (error.response) {
-        return new AxiosError(error.response.data.error.message, error);
-      }
-      return error;
     },
   },
 });
