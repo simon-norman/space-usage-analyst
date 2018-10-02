@@ -7,6 +7,7 @@ const { getConfigForEnvironment } = require('../config/config.js');
 const RavenWrapperFactory = require('raven-wrapper');
 const RetryEnabledApiStampFactory = require('../services/base_api/retry_enabled_api');
 const BaseApiStampFactory = require('../services/base_api/base_api');
+const checkIfSuccessfulGraphqlResponseHasNestedError = require('../helpers/graphql_response_error_checker');
 const EventEmittableStamp = require('../services/event_generation/event_emittable_stamp');
 const RecordingApiStampFactory = require('../services/recordings_retrieval/recording_api');
 const SpaceUsageApiStampFactory = require('../services/space_usage_save/space_usage_api');
@@ -71,8 +72,10 @@ const registerSpaceApi = () => {
 };
 
 const registerApis = () => {
+  registerDependency('checkIfSuccessfulGraphqlResponseHasNestedError', checkIfSuccessfulGraphqlResponseHasNestedError);
   registerDependencyFromFactory('BaseApiStamp', BaseApiStampFactory);
   registerDependencyFromFactory('RetryEnabledApiStamp', RetryEnabledApiStampFactory);
+
   registerRecordingApi();
   registerSpaceUsageApi();
   registerSpaceApi();
