@@ -12,10 +12,13 @@ const { expect } = chai;
 
 describe('Calculate space usage', function () {
   let mockSpaces;
+  let mockRecordings;
+  let mockSuccessfulGetSpacesResponse;
   let calculateSpaceUsageParams;
   let wifiRecordingsSpaceUsageCalculator;
   let spaceId1ExpectedSpaceUsageToBeCalculated;
   let spaceId2ExpectedSpaceUsageToBeCalculated;
+  let axiosHttpErrorResponse;
 
   const setPromisifiedTimeout = timeoutPeriodInMilliseconds => new Promise((resolve) => {
     setTimeout(() => {
@@ -29,7 +32,7 @@ describe('Calculate space usage', function () {
       { _id: '2', occupancyCapacity: 4 }
     ];
 
-    const mockSuccessfulGetSpacesResponse = {
+    mockSuccessfulGetSpacesResponse = {
       data: {
         GetAllSpaces: mockSpaces,
       },
@@ -47,7 +50,7 @@ describe('Calculate space usage', function () {
   };
 
   const setUpMockGetRecordingsApiCall = () => {
-    const mockRecordings = [
+    mockRecordings = [
       { timestampRecorded: new Date('December 10, 2000 00:00:01'), objectId: 1 },
       { timestampRecorded: new Date('December 10, 2000 00:01:01'), objectId: 1 },
       { timestampRecorded: new Date('December 10, 2000 00:04:01'), objectId: 2 },
@@ -55,6 +58,14 @@ describe('Calculate space usage', function () {
     ];
 
     mockAxios.onGet('/recordings').reply(200, mockRecordings);
+  };
+
+  const setUpMockApis = () => {
+    mockAxios.reset();
+
+    setUpMockSpaceAndSpaceUsageApiCalls();
+
+    setUpMockGetRecordingsApiCall();
   };
 
   const setUpWifiRecordingsSpaceUsageCalculator = () => {
@@ -84,16 +95,24 @@ describe('Calculate space usage', function () {
     spaceId2ExpectedSpaceUsageToBeCalculated.spaceId = mockSpaces[1]._id;
   };
 
+  const setUpHttpErrorResponse = () => {
+    axiosHttpErrorResponse = {
+      error: {
+        message: '',
+      },
+    };
+  };
 
-  before(() => {
-    setUpMockSpaceAndSpaceUsageApiCalls();
-    setUpMockGetRecordingsApiCall();
-
+  beforeEach(() => {
     setUpWifiRecordingsSpaceUsageCalculator();
 
     setUpParamsForSpaceUsageCalculation();
 
+    setUpMockApis();
+
     setUpExpectedSpaceUsagesToBeCalculated();
+
+    setUpHttpErrorResponse();
   });
 
   it('should calculate, for the specified timeframe, the space usage for each area', async function () {
@@ -107,6 +126,55 @@ describe('Calculate space usage', function () {
 
     const secondSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[2].data);
     expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
+      .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
+  });
+
+  it('should not duplicate space usage calculations (duplicates could be caused by space usage calculator adding duplicate listeners)', async function () {
+    mockAxios.onPost('/').reply(200, mockSuccessfulGetSpacesResponse);
+
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+    await setPromisifiedTimeout(1);
+
+    const firstSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[2].data);
+    expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
+      .deep.equals(spaceId1ExpectedSpaceUsageToBeCalculated);
+    expect(mockAxios.history.post.length).equals(6);
+
+    const secondSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[3].data);
+    expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
+      .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
+  });
+
+
+  it('should throw error if get recordings call (after any retry attempts have been made by axios-retry) returns an error that isn`t 404', async function () {
+    axiosHttpErrorResponse.error.message = 'bad request error';
+    mockAxios.onGet('/recordings').reply(400, axiosHttpErrorResponse);
+
+    process.on('unhandledRejection', (error) => {
+      expect(error.message).equals(axiosHttpErrorResponse.error.message);
+      expect(error.stack).to.exist;
+    });
+
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+    await setPromisifiedTimeout(1);
+  });
+
+  it('should, if get recordings returns 404, log exception without blowing up app, and move onto getting recordings for the next space', async function () {
+    axiosHttpErrorResponse.error.message = 'no recordings found';
+    mockAxios.reset();
+    setUpMockSpaceAndSpaceUsageApiCalls();
+    mockAxios.onGet('/recordings').replyOnce(404, axiosHttpErrorResponse)
+      .onGet('/recordings').reply(200, mockRecordings);
+
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+    await setPromisifiedTimeout(1);
+
+    const firstSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[1].data);
+    expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
       .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
   });
 });

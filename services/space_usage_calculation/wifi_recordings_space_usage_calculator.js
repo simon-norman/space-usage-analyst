@@ -17,16 +17,13 @@ module.exports = (
 
   methods: {
     calculateSpaceUsage({ startTime, endTime, avgIntervalPeriodThatDeviceDetected }) {
-      this.avgIntervalPeriodThatDeviceDetected
-        = avgIntervalPeriodThatDeviceDetected;
+      this.avgIntervalPeriodThatDeviceDetected = avgIntervalPeriodThatDeviceDetected;
 
-      const boundCalculateSpaceUsageForUsagePeriod
-        = this.calculateSpaceUsageForUsagePeriod.bind(this);
-      this.recordingsGetter.on('recordings-by-space-timeframe', boundCalculateSpaceUsageForUsagePeriod);
-
-      allRecordingsByTimeframeGetter.on('all-recordings-retrieved', () => {
-        this.recordingsGetter.removeAllListeners('recordings-by-space-timeframe', this.boundCalculateSpaceUsageForUsagePeriod);
-      });
+      const getRecordingsListeners = this.recordingsGetter.listeners('recordings-by-space-timeframe');
+      if (getRecordingsListeners.length === 0) {
+        const boundCalculateSpaceUsageForUsagePeriod = this.calculateSpaceUsageForUsagePeriod.bind(this);
+        this.recordingsGetter.on('recordings-by-space-timeframe', boundCalculateSpaceUsageForUsagePeriod);
+      }
 
       this.recordingsGetter.getAllRecordingsByTimeframe({ startTime, endTime });
     },
@@ -41,7 +38,7 @@ module.exports = (
         usagePeriodEndTime: calculationParams.endTime,
       };
 
-      spaceUsage.numberOfPeopleRecorded = this.calculateNoOfPeopleInUsagePeriod({
+      spaceUsage.numberOfPeopleRecorded = this.calculateNoOfPeopleRecorded({
         usagePeriodStartTime: calculationParams.startTime,
         usagePeriodEndTime: calculationParams.endTime,
         recordings: dedupedWifiRecordings,
@@ -52,7 +49,7 @@ module.exports = (
       this.saveSpaceUsage(spaceUsage);
     },
 
-    calculateNoOfPeopleInUsagePeriod({
+    calculateNoOfPeopleRecorded({
       usagePeriodStartTime,
       usagePeriodEndTime,
       recordings,

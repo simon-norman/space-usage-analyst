@@ -18,7 +18,6 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
             = this.getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime });
 
           await Promise.all(allPromisesToGetThenEmitRecordings);
-          this.emit('all-recordings-retrieved');
         } catch (error) {
           this.handleGetAllRecordingsError(error);
         }
@@ -45,12 +44,14 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         const allPromisesToGetThenEmitRecordings = [];
 
         for (const space of spaces) {
-          const promiseToGetThenEmitRecordings = this.getPromiseToGetThenEmitRecordings({
-            startTime,
-            endTime,
-            spaceId: space._id,
-            occupancyCapacity: space.occupancyCapacity,
-          });
+          const promiseToGetThenEmitRecordings = this.getPromiseToGetThenEmitRecordings(
+            {
+              startTime,
+              endTime,
+              spaceId: space._id,
+            },
+            space.occupancyCapacity
+          );
 
           allPromisesToGetThenEmitRecordings.push(promiseToGetThenEmitRecordings);
         }
@@ -58,13 +59,13 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         return allPromisesToGetThenEmitRecordings;
       },
 
-      getPromiseToGetThenEmitRecordings(paramsToGetRecordings) {
+      getPromiseToGetThenEmitRecordings(paramsToGetRecordings, occupancyCapacity) {
         return new Promise(async (resolve, reject) => {
           let recordings;
 
           try {
             recordings = await this.getRecordingsByTimeframeAndSpaceId(paramsToGetRecordings);
-            this.emitRecordings(recordings, paramsToGetRecordings);
+            this.emitRecordings(recordings, paramsToGetRecordings, occupancyCapacity);
             resolve();
           } catch (error) {
             this.handleGetRecordingsForSingleSpaceError(error, resolve, reject);
@@ -77,8 +78,9 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
           .then(response => response.data);
       },
 
-      emitRecordings(recordings, paramsToGetRecordings) {
-        const recordingsBySpaceIdAndTimeframe = paramsToGetRecordings;
+      emitRecordings(recordings, paramsToGetRecordings, occupancyCapacity) {
+        const recordingsBySpaceIdAndTimeframe = Object.assign({}, paramsToGetRecordings);
+        recordingsBySpaceIdAndTimeframe.occupancyCapacity = occupancyCapacity;
         recordingsBySpaceIdAndTimeframe.recordings = recordings;
 
         this.emit('recordings-by-space-timeframe', recordingsBySpaceIdAndTimeframe);
@@ -94,9 +96,9 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         } else if (error.response) {
           const axiosError = new AxiosError(error.response.data.error.message, error);
           reject(axiosError);
+        } else {
+          reject(error);
         }
-
-        reject(error);
       },
 
       handleGetAllRecordingsError(error) {

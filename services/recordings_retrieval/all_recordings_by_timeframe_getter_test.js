@@ -24,7 +24,7 @@ describe('recordings_for_site_getter', function () {
   let mockRecordingApi;
 
   const setUpMockSpaceApi = () => {
-    mockSpaces = [{ _id: '1A' }, { _id: '2A' }];
+    mockSpaces = [{ _id: '1A', occupancyCapacity: 4 }, { _id: '2A', occupancyCapacity: 6 }];
 
     stubbedGetSpaces = sinon.stub();
     stubbedGetSpaces.returns(Promise.resolve({ data: mockSpaces }));
@@ -66,12 +66,14 @@ describe('recordings_for_site_getter', function () {
     expectedReturnedRecordings = [
       {
         spaceId: mockSpaces[0]._id,
+        occupancyCapacity: mockSpaces[0].occupancyCapacity,
         startTime: getAllRecordingsByTimeframeParams.startTime,
         endTime: getAllRecordingsByTimeframeParams.endTime,
         recordings: mockRecordings,
       },
       {
         spaceId: mockSpaces[1]._id,
+        occupancyCapacity: mockSpaces[1].occupancyCapacity,
         startTime: getAllRecordingsByTimeframeParams.startTime,
         endTime: getAllRecordingsByTimeframeParams.endTime,
         recordings: mockRecordings,
@@ -151,7 +153,7 @@ describe('recordings_for_site_getter', function () {
       }
     };
 
-    const setUpGetSpacesErrorResponse = () => {
+    const setUpHttpErrorResponse = () => {
       axiosHttpErrorResponse = {
         response: {
           status: '',
@@ -165,7 +167,7 @@ describe('recordings_for_site_getter', function () {
     };
 
     beforeEach(() => {
-      setUpGetSpacesErrorResponse();
+      setUpHttpErrorResponse();
     });
 
     it('should log exception without throwing error further if no spaces error returned by spaces call', async function () {
