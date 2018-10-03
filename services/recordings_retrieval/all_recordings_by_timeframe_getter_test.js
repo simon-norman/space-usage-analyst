@@ -127,18 +127,6 @@ describe('recordings_for_site_getter', function () {
 
       expect(returnedRecordings).to.deep.equal(expectedReturnedRecordings);
     });
-
-    it('should emit a `all-recordings-retrieved` event once recordings have been passed for all spaces', async function () {
-      let allRecordingsRetrieved = false;
-      allRecordingsByTimeframeGetter.on('all-recordings-retrieved', () => {
-        allRecordingsRetrieved = true;
-      });
-
-      await allRecordingsByTimeframeGetter
-        .getAllRecordingsByTimeframe(getAllRecordingsByTimeframeParams);
-
-      expect(allRecordingsRetrieved).equals(true);
-    });
   });
 
   describe('error handling', function () {

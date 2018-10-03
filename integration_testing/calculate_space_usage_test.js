@@ -14,6 +14,7 @@ describe('Calculate space usage', function () {
   let mockSpaces;
   let mockRecordings;
   let mockSuccessfulGetSpacesResponse;
+  let mockSuccessfulSaveSpaceUsageResponse;
   let calculateSpaceUsageParams;
   let wifiRecordingsSpaceUsageCalculator;
   let spaceId1ExpectedSpaceUsageToBeCalculated;
@@ -38,7 +39,7 @@ describe('Calculate space usage', function () {
       },
     };
 
-    const mockSuccessfulSaveSpaceUsageResponse = {
+    mockSuccessfulSaveSpaceUsageResponse = {
       data: {
         CreateSpaceUsage: 'saved space usage data',
       },
@@ -147,12 +148,59 @@ describe('Calculate space usage', function () {
       .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
   });
 
+  it('should throw error if get spaces call (after any retry attempts have been made by axios-retry) returns an error that isn`t `no spaces found`', async function () {
+    mockAxios.reset();
+
+    setUpMockGetRecordingsApiCall();
+    const responseError = 'Server error';
+    const getSpacesResponseWithError = {
+      errors: [{
+        message: responseError,
+      }],
+    };
+    mockAxios
+      .onPost('/').reply(200, getSpacesResponseWithError);
+
+    process.once('unhandledRejection', (error) => {
+      expect(error.message).equals(responseError);
+    });
+
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+    await setPromisifiedTimeout(1);
+  });
+
+  it('should, if get spaces returns `No spaces found`, log exception without blowing up app', async function () {
+    mockAxios.reset();
+
+    setUpMockGetRecordingsApiCall();
+    const responseError = 'No spaces found';
+    const getSpacesResponseWithError = {
+      errors: [{
+        message: responseError,
+      }],
+    };
+    mockAxios
+      .onPost('/').reply(200, getSpacesResponseWithError);
+
+    let wasUnhandledRejectionThrown = false;
+    process.once('unhandledRejection', (error) => {
+      wasUnhandledRejectionThrown = true;
+    });
+
+    wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+    await setPromisifiedTimeout(1);
+
+    expect(wasUnhandledRejectionThrown).equals(false);
+  });
+
 
   it('should throw error if get recordings call (after any retry attempts have been made by axios-retry) returns an error that isn`t 404', async function () {
     axiosHttpErrorResponse.error.message = 'bad request error';
     mockAxios.onGet('/recordings').reply(400, axiosHttpErrorResponse);
 
-    process.on('unhandledRejection', (error) => {
+    process.once('unhandledRejection', (error) => {
       expect(error.message).equals(axiosHttpErrorResponse.error.message);
       expect(error.stack).to.exist;
     });
