@@ -60,22 +60,6 @@ describe('recording_api', () => {
         },
       )).to.equal(true);
     });
-
-    it('should return the recordings', async () => {
-      const returnedRecordings = recordingApi.getRecordings(recordingsCallParams);
-
-      expect(returnedRecordings).to.equal(mockRecordings);
-    });
-  });
-
-  describe('Errors when creating recording api stamp', () => {
-    it('should throw error if retry enabled api stamp not provided', async () => {
-      const createStampWithoutParameters = () => {
-        RecordingApiStampFactory();
-      };
-
-      expect(createStampWithoutParameters).to.throw(Error);
-    });
   });
 });
 

@@ -5,27 +5,27 @@ module.exports = (
   NoPeopleInUsagePeriodCalculatorStamp,
   calculateOccupancy,
   spaceUsageApi,
-  allRecordingsByTimeframeGetter
+  dataToCalcSpaceUsageGetter
 ) => stampit({
   props: {
     wifiRecordingsDeduplicator,
     NoPeopleInUsagePeriodCalculatorStamp,
     calculateOccupancy,
     spaceUsageApi,
-    recordingsGetter: allRecordingsByTimeframeGetter,
+    dataToCalcSpaceUsageGetter,
   },
 
   methods: {
     calculateSpaceUsage({ startTime, endTime, avgIntervalPeriodThatDeviceDetected }) {
       this.avgIntervalPeriodThatDeviceDetected = avgIntervalPeriodThatDeviceDetected;
 
-      const getRecordingsListeners = this.recordingsGetter.listeners('recordings-by-space-timeframe');
+      const getRecordingsListeners = this.dataToCalcSpaceUsageGetter.listeners('recordings-by-space-timeframe');
       if (getRecordingsListeners.length === 0) {
         const boundCalculateSpaceUsageForUsagePeriod = this.calculateSpaceUsageForUsagePeriod.bind(this);
-        this.recordingsGetter.on('recordings-by-space-timeframe', boundCalculateSpaceUsageForUsagePeriod);
+        this.dataToCalcSpaceUsageGetter.on('recordings-by-space-timeframe', boundCalculateSpaceUsageForUsagePeriod);
       }
 
-      this.recordingsGetter.getAllRecordingsByTimeframe({ startTime, endTime });
+      this.dataToCalcSpaceUsageGetter.getDataToCalcSpaceUsage({ startTime, endTime });
     },
 
     calculateSpaceUsageForUsagePeriod(calculationParams) {

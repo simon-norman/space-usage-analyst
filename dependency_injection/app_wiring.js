@@ -12,7 +12,7 @@ const EventEmittableStamp = require('../services/event_generation/event_emittabl
 const RecordingApiStampFactory = require('../services/recordings_retrieval/recording_api');
 const SpaceUsageApiStampFactory = require('../services/space_usage_save/space_usage_api');
 const SpaceApiStampFactory = require('../services/spaces_retrieval/space_api');
-const AllRecordingsByTimeframeGetterStampFactory = require('../services/recordings_retrieval/all_recordings_by_timeframe_getter');
+const DataToCalcSpaceUsageGetterStampFactory = require('../services/recordings_retrieval/data_to_calc_space_usage_getter.js');
 const WifiRecordingsSpaceUsageCalculatorStampFactory = require('../services/space_usage_calculation/wifi_recordings_space_usage_calculator');
 const objectArrayDedupe = require('array-dedupe');
 const calculateOccupancy = require('../services/space_usage_calculation/occupancy_calculator');
@@ -84,9 +84,9 @@ const registerApis = () => {
 
 const registerRecordingsRetrieval = () => {
   registerDependencyFromStampFactory(
-    'allRecordingsByTimeframeGetter',
-    'AllRecordingsByTimeframeGetterStamp',
-    AllRecordingsByTimeframeGetterStampFactory
+    'dataToCalcSpaceUsageGetter',
+    'DataToCalcSpaceUsageGetterStamp',
+    DataToCalcSpaceUsageGetterStampFactory
   );
 };
 

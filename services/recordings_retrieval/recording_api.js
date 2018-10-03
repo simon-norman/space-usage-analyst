@@ -1,29 +1,31 @@
 const stampit = require('stampit');
-
-const checkStampFactoryArgumentsValid = (RetryEnabledApiStamp) => {
-  const errors = [];
-  if (!RetryEnabledApiStamp) {
-    errors.push('Retry Enabled Stamp not provided to Api stamp factory');
-  }
-
-  if (errors.length) {
-    throw new Error(errors.join('; '));
-  }
-};
+const AxiosError = require('axios-error');
 
 module.exports = (RetryEnabledApiStamp) => {
-  checkStampFactoryArgumentsValid(RetryEnabledApiStamp);
   const RecordingApiStamp = stampit({
     props: {
       baseRecordingsPath: '/recordings',
     },
 
     methods: {
-      getRecordings(recordingsCallParams) {
-        return this.get(
-          this.baseRecordingsPath,
-          { params: recordingsCallParams }
-        );
+      async getRecordings(recordingsCallParams) {
+        try {
+          const response = await this.get(
+            this.baseRecordingsPath,
+            { params: recordingsCallParams }
+          );
+
+          return response.data;
+        } catch (error) {
+          throw this.createFormattedGetRecordingsError(error);
+        }
+      },
+
+      createFormattedGetRecordingsError(error) {
+        if (error.response) {
+          return new AxiosError(error.response.data.error.message, error);
+        }
+        return error;
       },
     },
   });

@@ -184,7 +184,7 @@ describe('Calculate space usage', function () {
       .onPost('/').reply(200, getSpacesResponseWithError);
 
     let wasUnhandledRejectionThrown = false;
-    process.once('unhandledRejection', (error) => {
+    process.once('unhandledRejection', () => {
       wasUnhandledRejectionThrown = true;
     });
 

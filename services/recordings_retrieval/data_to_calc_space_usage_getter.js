@@ -1,8 +1,7 @@
 const stampit = require('stampit');
-const AxiosError = require('axios-error');
 
 module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => {
-  const AllRecordingsByTimeframeGetterStamp = stampit({
+  const DataToCalcSpaceUsageGetterStamp = stampit({
     props: {
       spaceApi,
       recordingApi,
@@ -10,12 +9,12 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
     },
 
     methods: {
-      async getAllRecordingsByTimeframe({ startTime, endTime }) {
+      async getDataToCalcSpaceUsage({ startTime, endTime }) {
         try {
           const spaces = await this.getAllSpaces();
 
           const allPromisesToGetThenEmitRecordings
-            = this.getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime });
+            = this.getAllPromisesToGetRecordingsThenEmitAllCalcData(spaces, { startTime, endTime });
 
           await Promise.all(allPromisesToGetThenEmitRecordings);
         } catch (error) {
@@ -40,11 +39,11 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         return configuredError;
       },
 
-      getAllPromisesToGetThenEmitRecordings(spaces, { startTime, endTime }) {
+      getAllPromisesToGetRecordingsThenEmitAllCalcData(spaces, { startTime, endTime }) {
         const allPromisesToGetThenEmitRecordings = [];
 
         for (const space of spaces) {
-          const promiseToGetThenEmitRecordings = this.getPromiseToGetThenEmitRecordings(
+          const promiseToGetThenEmitRecordings = this.getPromiseToGetRecordingsThenEmitAllCalcData(
             {
               startTime,
               endTime,
@@ -59,13 +58,13 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         return allPromisesToGetThenEmitRecordings;
       },
 
-      getPromiseToGetThenEmitRecordings(paramsToGetRecordings, occupancyCapacity) {
+      getPromiseToGetRecordingsThenEmitAllCalcData(paramsToGetRecordings, occupancyCapacity) {
         return new Promise(async (resolve, reject) => {
           let recordings;
 
           try {
-            recordings = await this.getRecordingsByTimeframeAndSpaceId(paramsToGetRecordings);
-            this.emitRecordings(recordings, paramsToGetRecordings, occupancyCapacity);
+            recordings = await this.recordingApi.getRecordings(paramsToGetRecordings);
+            this.emitAllCalcData(recordings, paramsToGetRecordings, occupancyCapacity);
             resolve();
           } catch (error) {
             this.handleGetRecordingsForSingleSpaceError(error, resolve, reject);
@@ -73,12 +72,7 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         });
       },
 
-      getRecordingsByTimeframeAndSpaceId(params) {
-        return this.recordingApi.getRecordings(params)
-          .then(response => response.data);
-      },
-
-      emitRecordings(recordings, paramsToGetRecordings, occupancyCapacity) {
+      emitAllCalcData(recordings, paramsToGetRecordings, occupancyCapacity) {
         const recordingsBySpaceIdAndTimeframe = Object.assign({}, paramsToGetRecordings);
         recordingsBySpaceIdAndTimeframe.occupancyCapacity = occupancyCapacity;
         recordingsBySpaceIdAndTimeframe.recordings = recordings;
@@ -87,15 +81,9 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
       },
 
       handleGetRecordingsForSingleSpaceError(error, resolve, reject) {
-        if (error.response && error.response.status === 404) {
-          const recordingsNotFoundError
-            = new AxiosError(error.response.data.error.message, error);
-
-          this.logException(recordingsNotFoundError);
+        if (error.response.status === 404) {
+          this.logException(error);
           resolve();
-        } else if (error.response) {
-          const axiosError = new AxiosError(error.response.data.error.message, error);
-          reject(axiosError);
         } else {
           reject(error);
         }
@@ -111,5 +99,5 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
     },
   });
 
-  return AllRecordingsByTimeframeGetterStamp.compose(EventEmittableStamp);
+  return DataToCalcSpaceUsageGetterStamp.compose(EventEmittableStamp);
 };
