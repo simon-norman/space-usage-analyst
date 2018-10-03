@@ -11,7 +11,10 @@ chai.use(chaiAsPromised);
 const { expect } = chai;
 
 describe('Calculate space usage', function () {
+  let mockSpaces;
   let wifiRecordingsSpaceUsageCalculator;
+  let expectedSpaceUsageToBeCalculatedSpaceId1;
+  let expectedSpaceUsageToBeCalculatedSpaceId2;
 
   const setPromisifiedTimeout = timeoutPeriodInMilliseconds => new Promise((resolve) => {
     setTimeout(() => {
@@ -20,9 +23,9 @@ describe('Calculate space usage', function () {
   });
 
   const setUpMockSpaceAndSpaceUsageApiCalls = () => {
-    const mockSpaces = [
-      { spaceId: '1', occupancyCapacity: 4 },
-      { spaceId: '2', occupancyCapacity: 4 }
+    mockSpaces = [
+      { _id: '1', occupancyCapacity: 4 },
+      { _id: '2', occupancyCapacity: 4 }
     ];
 
     const mockSuccessfulGetSpacesResponse = {
@@ -65,18 +68,27 @@ describe('Calculate space usage', function () {
     avgIntervalPeriodThatDeviceDetected: 15 * 60 * 1000,
   };
 
-  const expectedSpaceUsageToBeCalculated = {
-    numberOfPeopleRecorded: 2,
-    usagePeriodEndTime: 976407300000,
-    usagePeriodStartTime: 976406400000,
-    occupancy: 0.5,
+  const setUpExpectedSpaceUsageToBeCalculated = () => {
+    expectedSpaceUsageToBeCalculatedSpaceId1 = {
+      numberOfPeopleRecorded: 2,
+      usagePeriodEndTime: 976407300000,
+      usagePeriodStartTime: 976406400000,
+      occupancy: 0.5,
+      spaceId: mockSpaces[0]._id,
+    };
+
+    expectedSpaceUsageToBeCalculatedSpaceId2 = Object.assign({}, expectedSpaceUsageToBeCalculatedSpaceId1);
+    expectedSpaceUsageToBeCalculatedSpaceId2.spaceId = mockSpaces[1]._id;
   };
+
 
   before(() => {
     setUpMockSpaceAndSpaceUsageApiCalls();
     setUpMockGetRecordingsApiCall();
 
     setUpWifiRecordingsSpaceUsageCalculator();
+
+    setUpExpectedSpaceUsageToBeCalculated();
   });
 
   it('should calculate, for the specified timeframe, the space usage for each area', async function () {
@@ -86,10 +98,10 @@ describe('Calculate space usage', function () {
 
     const firstSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[1].data);
     expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
-      .deep.equals(expectedSpaceUsageToBeCalculated);
+      .deep.equals(expectedSpaceUsageToBeCalculatedSpaceId1);
 
     const secondSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[2].data);
     expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
-      .deep.equals(expectedSpaceUsageToBeCalculated);
+      .deep.equals(expectedSpaceUsageToBeCalculatedSpaceId2);
   });
 });

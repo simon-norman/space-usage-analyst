@@ -41,13 +41,13 @@ module.exports = (
         usagePeriodEndTime: calculationParams.endTime,
       };
 
-      spaceUsage.noPeopleInUsagePeriod = this.calculateNoOfPeopleInUsagePeriod({
+      spaceUsage.numberOfPeopleRecorded = this.calculateNoOfPeopleInUsagePeriod({
         usagePeriodStartTime: calculationParams.startTime,
         usagePeriodEndTime: calculationParams.endTime,
         recordings: dedupedWifiRecordings,
       });
 
-      spaceUsage.occupancy = this.calculateOccupancy(spaceUsage.noPeopleInUsagePeriod, calculationParams.occupancyCapacity);
+      spaceUsage.occupancy = this.calculateOccupancy(spaceUsage.numberOfPeopleRecorded, calculationParams.occupancyCapacity);
 
       this.saveSpaceUsage(spaceUsage);
     },

@@ -1,9 +1,9 @@
 
-const calculateOccupancy = (noOfPeopleInUsagePeriod, occupancyCapacity) => {
-  if (noOfPeopleInUsagePeriod > occupancyCapacity) {
+const calculateOccupancy = (numberOfPeopleRecorded, occupancyCapacity) => {
+  if (numberOfPeopleRecorded > occupancyCapacity) {
     return 1.0;
   }
-  return occupancyCapacity / noOfPeopleInUsagePeriod;
+  return numberOfPeopleRecorded / occupancyCapacity;
 };
 
 module.exports = calculateOccupancy;

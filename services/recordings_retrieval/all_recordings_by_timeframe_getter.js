@@ -49,6 +49,7 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
             startTime,
             endTime,
             spaceId: space._id,
+            occupancyCapacity: space.occupancyCapacity,
           });
 
           allPromisesToGetThenEmitRecordings.push(promiseToGetThenEmitRecordings);
@@ -76,13 +77,9 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
           .then(response => response.data);
       },
 
-      emitRecordings(recordings, { spaceId, startTime, endTime }) {
-        const recordingsBySpaceIdAndTimeframe = {
-          spaceId,
-          startTime,
-          endTime,
-          recordings,
-        };
+      emitRecordings(recordings, paramsToGetRecordings) {
+        const recordingsBySpaceIdAndTimeframe = paramsToGetRecordings;
+        recordingsBySpaceIdAndTimeframe.recordings = recordings;
 
         this.emit('recordings-by-space-timeframe', recordingsBySpaceIdAndTimeframe);
       },
