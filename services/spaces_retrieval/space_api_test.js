@@ -1,67 +1,108 @@
 
-const { expect } = require('chai');
+const chai = require('chai');
 const sinon = require('sinon');
 const stampit = require('stampit');
+const checkIfSuccessfulGraphqlResponseHasNestedError = require('../../helpers/graphql_response_error_checker');
+
+chai.use(require('chai-string'));
+
+const { expect } = chai;
 
 const SpaceApiStampFactory = require('./space_api.js');
 
 
 describe('space_api', () => {
   let mockSpaces;
-  let getStub;
+  let mockSuccessfulGetSpacesResponse;
+  let postStub;
   let RetryEnabledApiStamp;
-  let mockGetSpacesParams;
   let SpaceApiStamp;
   let spaceApi;
 
+  const setUpMockSuccessfulGetSpacesResponse = () => {
+    mockSpaces = 'spaces';
+
+    mockSuccessfulGetSpacesResponse = {
+      data: {
+        data: {
+          GetAllSpaces: mockSpaces,
+        },
+      },
+    };
+  };
+
   const setUpMockRetryEnabledApi = () => {
-    mockSpaces = 'devicespaces';
-    getStub = sinon.stub();
-    getStub.returns(mockSpaces);
+    setUpMockSuccessfulGetSpacesResponse();
+
+    postStub = sinon.stub();
+    postStub.returns(mockSuccessfulGetSpacesResponse);
+
     RetryEnabledApiStamp = stampit({
       init() {
-        this.get = getStub;
+        this.post = postStub;
       },
     });
   };
 
-  const setUpTests = () => {
-    setUpMockRetryEnabledApi();
-
-    mockGetSpacesParams = 'mock get spaces params';
-
-    SpaceApiStamp = SpaceApiStampFactory(RetryEnabledApiStamp);
-    spaceApi = SpaceApiStamp();
+  const getErrorFromFailingPromise = async (failingPromise) => {
+    try {
+      return await failingPromise;
+    } catch (error) {
+      return error;
+    }
   };
 
   describe('Get spaces', () => {
     beforeEach(() => {
-      setUpTests();
+      setUpMockRetryEnabledApi();
+
+      SpaceApiStamp = SpaceApiStampFactory(
+        RetryEnabledApiStamp,
+        checkIfSuccessfulGraphqlResponseHasNestedError
+      );
+      spaceApi = SpaceApiStamp();
     });
 
-    it('should call space api', async () => {
-      await spaceApi.getSpaces(mockGetSpacesParams);
+    it('should call space api and return the spaces', async () => {
+      const expectedGetAllSpacesQueryString = `{ GetAllSpaces {
+        _id
+        name
+        occupancyCapacity
+      }}`;
 
-      expect(getStub.calledWithExactly(
-        '/spaces/',
-        { params: mockGetSpacesParams },
-      )).to.equal(true);
+      const getSpacesResponse = await spaceApi.getSpaces();
+
+      expect(postStub.args[0][0]).equals('/');
+      expect(postStub.args[0][1].query).equalIgnoreSpaces(expectedGetAllSpacesQueryString);
+      expect(getSpacesResponse).deep.equals({ data: mockSpaces });
     });
 
-    it('should return the spaces', async () => {
-      const returnedSpaces = spaceApi.getSpaces(mockGetSpacesParams);
+    it('should return a failing promise with error if get spaces response is an HTTP error thrown by server', async () => {
+      const error = new Error('some error');
+      postStub.returns(Promise.reject(error));
 
-      expect(returnedSpaces).to.equal(mockSpaces);
+      const response = spaceApi.getSpaces();
+      const errorFromGetSpaces = await getErrorFromFailingPromise(response);
+
+      expect(errorFromGetSpaces).equals(error);
     });
-  });
 
-  describe('Errors when creating space api stamp', () => {
-    it('should throw error if retry enabled api stamp not provided', async () => {
-      const createStampWithoutParameters = () => {
-        SpaceApiStampFactory();
+    it('should return a failing promise with error when get spaces response is 200 success BUT has errors buried in response (this is sometimes graphql format)', async () => {
+      const responseError = 'some error';
+      const getSpacesResponse = {
+        data: {
+          errors: [{
+            message: responseError,
+          }],
+        },
       };
+      postStub.returns(Promise.resolve(getSpacesResponse));
 
-      expect(createStampWithoutParameters).to.throw(Error);
+      const response = spaceApi.getSpaces();
+      const errorFromGetSpaces = await getErrorFromFailingPromise(response);
+
+      expect(errorFromGetSpaces.message).equals(responseError);
+      expect(errorFromGetSpaces.errorDetail).equals(getSpacesResponse);
     });
   });
 });

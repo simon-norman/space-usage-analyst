@@ -34,16 +34,10 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
       },
 
       createGetSpacesError(error) {
-        let configuredError = error;
-
-        if (error.response && error.response.status === 404) {
-          configuredError = new AxiosError('No spaces found', error);
+        const configuredError = error;
+        if (error.message === 'No spaces found') {
           configuredError.isRecoverable = true;
-        } else if (error.response) {
-          configuredError = new AxiosError(error.response.data.error.message, error);
-          configuredError.isRecoverable = false;
         }
-
         return configuredError;
       },
 
