@@ -12,9 +12,10 @@ const { expect } = chai;
 
 describe('Calculate space usage', function () {
   let mockSpaces;
+  let calculateSpaceUsageParams;
   let wifiRecordingsSpaceUsageCalculator;
-  let expectedSpaceUsageToBeCalculatedSpaceId1;
-  let expectedSpaceUsageToBeCalculatedSpaceId2;
+  let spaceId1ExpectedSpaceUsageToBeCalculated;
+  let spaceId2ExpectedSpaceUsageToBeCalculated;
 
   const setPromisifiedTimeout = timeoutPeriodInMilliseconds => new Promise((resolve) => {
     setTimeout(() => {
@@ -62,23 +63,25 @@ describe('Calculate space usage', function () {
     wifiRecordingsSpaceUsageCalculator = diContainer.getDependency('wifiRecordingsSpaceUsageCalculator');
   };
 
-  const calculateSpaceUsageParams = {
-    startTime: new Date('December 10, 2000 00:00:00').getTime(),
-    endTime: new Date('December 10, 2000 00:15:00').getTime(),
-    avgIntervalPeriodThatDeviceDetected: 15 * 60 * 1000,
+  const setUpParamsForSpaceUsageCalculation = () => {
+    calculateSpaceUsageParams = {
+      startTime: new Date('December 10, 2000 00:00:00').getTime(),
+      endTime: new Date('December 10, 2000 00:15:00').getTime(),
+      avgIntervalPeriodThatDeviceDetected: 15 * 60 * 1000,
+    };
   };
 
-  const setUpExpectedSpaceUsageToBeCalculated = () => {
-    expectedSpaceUsageToBeCalculatedSpaceId1 = {
+  const setUpExpectedSpaceUsagesToBeCalculated = () => {
+    spaceId1ExpectedSpaceUsageToBeCalculated = {
       numberOfPeopleRecorded: 2,
-      usagePeriodEndTime: 976407300000,
-      usagePeriodStartTime: 976406400000,
+      usagePeriodStartTime: calculateSpaceUsageParams.startTime,
+      usagePeriodEndTime: calculateSpaceUsageParams.endTime,
       occupancy: 0.5,
       spaceId: mockSpaces[0]._id,
     };
 
-    expectedSpaceUsageToBeCalculatedSpaceId2 = Object.assign({}, expectedSpaceUsageToBeCalculatedSpaceId1);
-    expectedSpaceUsageToBeCalculatedSpaceId2.spaceId = mockSpaces[1]._id;
+    spaceId2ExpectedSpaceUsageToBeCalculated = Object.assign({}, spaceId1ExpectedSpaceUsageToBeCalculated);
+    spaceId2ExpectedSpaceUsageToBeCalculated.spaceId = mockSpaces[1]._id;
   };
 
 
@@ -88,7 +91,9 @@ describe('Calculate space usage', function () {
 
     setUpWifiRecordingsSpaceUsageCalculator();
 
-    setUpExpectedSpaceUsageToBeCalculated();
+    setUpParamsForSpaceUsageCalculation();
+
+    setUpExpectedSpaceUsagesToBeCalculated();
   });
 
   it('should calculate, for the specified timeframe, the space usage for each area', async function () {
@@ -98,10 +103,10 @@ describe('Calculate space usage', function () {
 
     const firstSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[1].data);
     expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
-      .deep.equals(expectedSpaceUsageToBeCalculatedSpaceId1);
+      .deep.equals(spaceId1ExpectedSpaceUsageToBeCalculated);
 
     const secondSpaceUsagePostedToMockSpaceUsageApi = JSON.parse(mockAxios.history.post[2].data);
     expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
-      .deep.equals(expectedSpaceUsageToBeCalculatedSpaceId2);
+      .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
   });
 });
