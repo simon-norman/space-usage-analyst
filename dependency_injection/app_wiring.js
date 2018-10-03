@@ -14,6 +14,7 @@ const SpaceApiStampFactory = require('../services/spaces_retrieval/space_api');
 const AllRecordingsByTimeframeGetterStampFactory = require('../services/recordings_retrieval/all_recordings_by_timeframe_getter');
 const WifiRecordingsSpaceUsageCalculatorStampFactory = require('../services/space_usage_calculation/wifi_recordings_space_usage_calculator');
 const objectArrayDedupe = require('array-dedupe');
+const calculateOccupancy = require('../services/space_usage_calculation/occupancy_calculator');
 const WifiRecordingsDeduplicatorStampFactory = require('../services/space_usage_calculation/wifi_recordings_deduplicator');
 const NoPeopleInUsagePeriodCalculatorStampFactory = require('../services/space_usage_calculation/no_people_in_usage_period_calculator');
 const scheduler = require('node-schedule');
@@ -94,6 +95,8 @@ const registerSpaceUsageCalculation = () => {
     'WifiRecordingsDeduplicatorStamp',
     WifiRecordingsDeduplicatorStampFactory
   );
+
+  registerDependency('calculateOccupancy', calculateOccupancy);
 
   registerDependencyFromFactory('NoPeopleInUsagePeriodCalculatorStamp', NoPeopleInUsagePeriodCalculatorStampFactory);
 

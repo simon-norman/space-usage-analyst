@@ -4,12 +4,14 @@ const AxiosError = require('axios-error');
 module.exports = (
   wifiRecordingsDeduplicator,
   NoPeopleInUsagePeriodCalculatorStamp,
+  calculateOccupancy,
   spaceUsageApi,
   allRecordingsByTimeframeGetter
 ) => stampit({
   props: {
     wifiRecordingsDeduplicator,
     NoPeopleInUsagePeriodCalculatorStamp,
+    calculateOccupancy,
     spaceUsageApi,
     recordingsGetter: allRecordingsByTimeframeGetter,
   },
@@ -30,26 +32,28 @@ module.exports = (
       this.recordingsGetter.getAllRecordingsByTimeframe({ startTime, endTime });
     },
 
-    calculateSpaceUsageForUsagePeriod({
-      spaceId,
-      startTime,
-      endTime,
-      recordings,
-    }) {
-      const dedupedWifiRecordings = wifiRecordingsDeduplicator.dedupeRecordings(recordings);
+    calculateSpaceUsageForUsagePeriod(calculationParams) {
+      const dedupedWifiRecordings
+        = wifiRecordingsDeduplicator.dedupeRecordings(calculationParams.recordings);
 
-      const spaceUsage = this.calculateNoOfPeopleInUsagePeriod({
-        spaceId,
-        usagePeriodStartTime: startTime,
-        usagePeriodEndTime: endTime,
+      const spaceUsage = {
+        spaceId: calculationParams.spaceId,
+        usagePeriodStartTime: calculationParams.startTime,
+        usagePeriodEndTime: calculationParams.endTime,
+      };
+
+      spaceUsage.noPeopleInUsagePeriod = this.calculateNoOfPeopleInUsagePeriod({
+        usagePeriodStartTime: calculationParams.startTime,
+        usagePeriodEndTime: calculationParams.endTime,
         recordings: dedupedWifiRecordings,
       });
+
+      spaceUsage.occupancy = this.calculateOccupancy(spaceUsage.noPeopleInUsagePeriod, calculationParams.occupancyCapacity);
 
       this.saveSpaceUsage(spaceUsage);
     },
 
     calculateNoOfPeopleInUsagePeriod({
-      spaceId,
       usagePeriodStartTime,
       usagePeriodEndTime,
       recordings,
@@ -60,15 +64,7 @@ module.exports = (
         snapshotLengthInMilliseconds: this.avgIntervalPeriodThatDeviceDetected,
       });
 
-      const noPeopleInUsagePeriod
-        = noPeopleInUsagePeriodCalculator.calculateNoOfPeopleInUsagePeriod(recordings);
-
-      return {
-        spaceId,
-        usagePeriodStartTime,
-        usagePeriodEndTime,
-        numberOfPeopleRecorded: noPeopleInUsagePeriod,
-      };
+      return noPeopleInUsagePeriodCalculator.calculateNoOfPeopleInUsagePeriod(recordings);
     },
 
     saveSpaceUsage(spaceUsage) {

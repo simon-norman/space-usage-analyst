@@ -21,8 +21,8 @@ describe('Calculate space usage', function () {
 
   const setUpMockGetSpacesApiCall = () => {
     const mockSpaces = [
-      { spaceId: '1' },
-      { spaceId: '2' }
+      { spaceId: '1', occupancyCapacity: 4 },
+      { spaceId: '2', occupancyCapacity: 4 }
     ];
 
     mockAxios.onGet('/spaces/').reply(200, mockSpaces);
@@ -55,6 +55,7 @@ describe('Calculate space usage', function () {
     numberOfPeopleRecorded: 2,
     usagePeriodEndTime: 976407300000,
     usagePeriodStartTime: 976406400000,
+    occupancy: 0.5,
   };
 
   before(() => {
