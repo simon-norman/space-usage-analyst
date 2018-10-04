@@ -16,9 +16,9 @@ describe('Calculate space usage', function () {
   let mockSuccessfulSaveSpaceUsageResponse;
   let postSpaceUsageStub;
   let logExceptionSpy;
-  let calculateSpaceUsageParams;
   let diContainer;
   let wifiRecordingsSpaceUsageCalculator;
+  let calculateSpaceUsageParams;
   let spaceId1ExpectedSpaceUsageToBeCalculated;
   let spaceId2ExpectedSpaceUsageToBeCalculated;
   let graphQlResponseWithNestedError;
@@ -237,7 +237,6 @@ describe('Calculate space usage', function () {
 
         process.once('unhandledRejection', (error) => {
           expect(error.message).equals(axiosHttpErrorResponse.response.data.error.message);
-          expect(error.stack).to.exist;
         });
 
         wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
@@ -260,6 +259,7 @@ describe('Calculate space usage', function () {
         const firstSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.firstCall.args[1];
         expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
           .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
+
         expect(logExceptionSpy.firstCall.args[0].message).equals('No recordings found');
       });
     });
