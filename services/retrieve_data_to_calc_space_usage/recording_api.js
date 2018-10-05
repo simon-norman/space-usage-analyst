@@ -1,8 +1,8 @@
-const stampit = require('stampit');
+
 const AxiosError = require('axios-error');
 
-module.exports = (RetryEnabledApiStamp) => {
-  const RecordingApiStamp = stampit({
+module.exports = (RetryEnabledApiStamp, AccessTokensGetterStamp) => {
+  const RecordingApiStamp = RetryEnabledApiStamp.compose(AccessTokensGetterStamp, {
     props: {
       baseRecordingsPath: '/recordings',
     },
@@ -29,5 +29,5 @@ module.exports = (RetryEnabledApiStamp) => {
       },
     },
   });
-  return RecordingApiStamp.compose(RetryEnabledApiStamp);
+  return RecordingApiStamp;
 };
