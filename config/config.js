@@ -1,5 +1,36 @@
 /* eslint prefer-spread: "off" */
 
+const configForAllEnvExceptDev = {
+  webServer: {
+    port: process.env.PORT,
+  },
+
+  scheduleUsageAnalysis: {
+    usageAnalysisPeriod: 900000,
+    secondsOfMinute: 0,
+    minutesOfHour: [0, 15, 30, 45],
+    avgIntervalPeriodThatDeviceDetected: 900000,
+  },
+
+  spaceUsageApi: {
+    baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
+  },
+
+  recordingApi: {
+    baseUrl: process.env.RECORDING_API_BASE_URL,
+  },
+
+  errorLogging: {
+    environment: '',
+    ravenConfig: {
+      dsn: process.env.RAVEN_DSN,
+      options: {
+        captureUnhandledRejections: true,
+      },
+    },
+  },
+};
+
 const config = {
   development: {
     webServer: {
@@ -31,98 +62,11 @@ const config = {
     },
   },
 
-  test: {
-    webServer: {
-      port: process.env.PORT,
-    },
+  test: configForAllEnvExceptDev,
 
-    scheduleUsageAnalysis: {
-      usageAnalysisPeriod: 900000,
-      secondsOfMinute: 0,
-      minutesOfHour: [0, 15, 30, 45],
-      avgIntervalPeriodThatDeviceDetected: 900000,
-    },
+  qa: configForAllEnvExceptDev,
 
-    spaceUsageApi: {
-      baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
-    },
-
-    recordingApi: {
-      baseUrl: process.env.RECORDING_API_BASE_URL,
-    },
-
-    errorLogging: {
-      environment: '',
-      ravenConfig: {
-        dsn: process.env.RAVEN_DSN,
-        options: {
-          captureUnhandledRejections: true,
-        },
-      },
-    },
-  },
-
-  qa: {
-    webServer: {
-      port: process.env.PORT,
-    },
-
-    scheduleUsageAnalysis: {
-      usageAnalysisPeriod: 900000,
-      secondsOfMinute: 0,
-      minutesOfHour: [0, 15, 30, 45],
-      avgIntervalPeriodThatDeviceDetected: 900000,
-    },
-
-    spaceUsageApi: {
-      baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
-    },
-
-    recordingApi: {
-      baseUrl: process.env.RECORDING_API_BASE_URL,
-    },
-
-    errorLogging: {
-      environment: '',
-      ravenConfig: {
-        dsn: process.env.RAVEN_DSN,
-        options: {
-          captureUnhandledRejections: true,
-        },
-      },
-    },
-  },
-
-  production: {
-    webServer: {
-      port: process.env.PORT,
-    },
-
-    scheduleUsageAnalysis: {
-      usageAnalysisPeriod: 900000,
-      secondsOfMinute: 0,
-      minutesOfHour: [0, 15, 30, 45],
-      avgIntervalPeriodThatDeviceDetected: 900000,
-    },
-
-    spaceUsageApi: {
-      baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
-    },
-
-    recordingApi: {
-      baseUrl: process.env.RECORDING_API_BASE_URL,
-    },
-
-    errorLogging: {
-      environment: '',
-      ravenConfig: {
-        dsn: process.env.RAVEN_DSN,
-        options: {
-          captureUnhandledRejections: true,
-        },
-      },
-    },
-  },
+  production: configForAllEnvExceptDev,
 };
 
 const getConfigForEnvironment = (environment) => {

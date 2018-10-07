@@ -7,8 +7,10 @@ chai.use(sinonChai);
 chai.use(chaiAsPromised);
 const { expect } = chai;
 
-describe('Calculate space usage', function () {
+describe('Space usage calculator', function () {
   let mockSpaces;
+  let mockAccessTokenForRecordingsApi;
+  let getAccessTokenStub;
   let mockRecordings;
   let getRecordingsStub;
   let mockSuccessfulGetSpacesResponse;
@@ -50,7 +52,17 @@ describe('Calculate space usage', function () {
     getSpacesStub.returns(mockSuccessfulGetSpacesResponse);
   };
 
+  const setUpGetAccessTokenForApisStub = () => {
+    const accessTokensGetter = diContainer.getDependency('accessTokensGetter');
+    getAccessTokenStub = sinon.stub(accessTokensGetter, 'post');
+
+    mockAccessTokenForRecordingsApi = { token_type: 'some_token_type', access_token: 'some token data' };
+    getAccessTokenStub.onCall(0).returns(mockAccessTokenForRecordingsApi);
+  };
+
   const setUpMockGetRecordingsApiCall = () => {
+    setUpGetAccessTokenForApisStub();
+
     mockRecordings = [
       { timestampRecorded: new Date('December 10, 2000 00:00:01'), objectId: 1 },
       { timestampRecorded: new Date('December 10, 2000 00:01:01'), objectId: 1 },
@@ -156,6 +168,16 @@ describe('Calculate space usage', function () {
     setUpTemplateGraphQlResponseWithNestedError();
 
     setUpHttpErrorResponse();
+  });
+
+  context('when getting the recordings to calculate the space usage', function () {
+    it('should retrieve the access token for the recordings api', async function () {
+      wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+      await setPromisifiedTimeout(1);
+
+      expect(getAccessTokenStub.firstCall.args[0]).equals();
+    });
   });
 
   context('when recording and spaces data to calculate usage is available from apis', function () {

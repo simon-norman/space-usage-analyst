@@ -8,10 +8,6 @@ describe('base_api', () => {
   let apiConfig;
   let BaseApiStamp;
 
-  const wrappedCreateAccuwareApi = function () {
-    BaseApiStamp({ apiConfig });
-  };
-
   beforeEach(() => {
     apiConfig = {
       baseUrl: 'https://baseUrl.com',
@@ -23,12 +19,6 @@ describe('base_api', () => {
     const baseApi = BaseApiStamp({ apiConfig });
 
     expect(baseApi.axios.defaults.baseURL).to.equal(apiConfig.baseUrl);
-  });
-
-  it('should throw error if api config not provided', async function () {
-    apiConfig = '';
-
-    expect(wrappedCreateAccuwareApi).to.throw(Error);
   });
 });
 
