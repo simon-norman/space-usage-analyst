@@ -50,28 +50,30 @@ const setUpDiContainer = () => {
 const registerAccessTokensGetter = () => {
   const AccessTokensGetterStamp = registerDependencyFromFactory('AccessTokensGetterStamp', AccessTokensGetterStampFactory);
 
-  const accessTokensGetter = AccessTokensGetterStamp({ apiConfig: { baseUrl: 'https://accesstokensapi.com' } });
+  const accessTokensGetter = AccessTokensGetterStamp();
   registerDependency('accessTokensGetter', accessTokensGetter);
 };
 
 const registerRecordingApi = () => {
+  const recordingApiAccessTokenConfig = { accessTokenApiUrl: 'recordingApiServerUrl', credentialsToGetAccessToken: 'some credentials' };
+  registerDependency('recordingApiAccessTokenConfig', recordingApiAccessTokenConfig);
   const RecordingApiStamp = registerDependencyFromFactory('RecordingApiStamp', RecordingApiStampFactory);
 
-  const recordingApi = RecordingApiStamp({ apiConfig: { baseUrl: 'https://recordingapi.com' } });
+  const recordingApi = RecordingApiStamp({ baseURL: 'https://recordingapi.com' });
   registerDependency('recordingApi', recordingApi);
 };
 
 const registerSpaceUsageApi = () => {
   const SpaceUsageApiStamp = registerDependencyFromFactory('SpaceUsageApiStamp', SpaceUsageApiStampFactory);
 
-  const spaceUsageApi = SpaceUsageApiStamp({ apiConfig: { baseUrl: 'https://spaceusageapi.com' } });
+  const spaceUsageApi = SpaceUsageApiStamp({ baseURL: 'https://spaceusageapi.com' });
   registerDependency('spaceUsageApi', spaceUsageApi);
 };
 
 const registerSpaceApi = () => {
   const SpaceApiStamp = registerDependencyFromFactory('SpaceApiStamp', SpaceApiStampFactory);
 
-  const spaceApi = SpaceApiStamp({ baseUrl: 'https://spaceapi.com' });
+  const spaceApi = SpaceApiStamp({ baseURL: 'https://spaceapi.com' });
   registerDependency('spaceApi', spaceApi);
 };
 

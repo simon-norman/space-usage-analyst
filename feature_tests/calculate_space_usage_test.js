@@ -10,12 +10,9 @@ const { expect } = chai;
 describe('Space usage calculator', function () {
   let mockSpaces;
   let mockAccessTokenForRecordingsApi;
-  let getAccessTokenStub;
   let mockRecordings;
   let getRecordingsStub;
-  let mockSuccessfulGetSpacesResponse;
   let getSpacesStub;
-  let mockSuccessfulSaveSpaceUsageResponse;
   let postSpaceUsageStub;
   let logExceptionSpy;
   let diContainer;
@@ -38,7 +35,7 @@ describe('Space usage calculator', function () {
       { _id: '2', occupancyCapacity: 4 }
     ];
 
-    mockSuccessfulGetSpacesResponse = {
+    const mockSuccessfulGetSpacesResponse = {
       status: 200,
       data: {
         data: {
@@ -52,12 +49,21 @@ describe('Space usage calculator', function () {
     getSpacesStub.returns(mockSuccessfulGetSpacesResponse);
   };
 
+  const setUpGetAccessTokenForRecordingsApi = (getAccessTokenStub) => {
+    const recordingApiAccessTokenConfig = diContainer.getDependency('recordingApiAccessTokenConfig');
+    mockAccessTokenForRecordingsApi = { token_type: 'some_token_type', access_token: 'some token data' };
+
+    getAccessTokenStub.withArgs(
+      recordingApiAccessTokenConfig.accessTokenApiUrl,
+      recordingApiAccessTokenConfig.credentialsToGetAccessToken
+    ).returns(mockAccessTokenForRecordingsApi);
+  };
+
   const setUpGetAccessTokenForApisStub = () => {
     const accessTokensGetter = diContainer.getDependency('accessTokensGetter');
-    getAccessTokenStub = sinon.stub(accessTokensGetter, 'post');
+    const getAccessTokenStub = sinon.stub(accessTokensGetter, 'post');
 
-    mockAccessTokenForRecordingsApi = { token_type: 'some_token_type', access_token: 'some token data' };
-    getAccessTokenStub.onCall(0).returns(mockAccessTokenForRecordingsApi);
+    setUpGetAccessTokenForRecordingsApi(getAccessTokenStub);
   };
 
   const setUpMockGetRecordingsApiCall = () => {
@@ -76,7 +82,7 @@ describe('Space usage calculator', function () {
   };
 
   const setUpMockSaveSpaceUsageApiCall = () => {
-    mockSuccessfulSaveSpaceUsageResponse = {
+    const mockSuccessfulSaveSpaceUsageResponse = {
       status: 200,
       data: {
         data: {
@@ -171,12 +177,14 @@ describe('Space usage calculator', function () {
   });
 
   context('when getting the recordings to calculate the space usage', function () {
-    it('should retrieve the access token for the recordings api', async function () {
+    it('should call the recordings api with the retrieved access token as a header', async function () {
       wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
       await setPromisifiedTimeout(1);
 
-      expect(getAccessTokenStub.firstCall.args[0]).equals();
+      expect(getRecordingsStub.firstCall.args[1].headers).deep.equals({
+        authorization: `${mockAccessTokenForRecordingsApi.token_type} ${mockAccessTokenForRecordingsApi.access_token}`,
+      });
     });
   });
 

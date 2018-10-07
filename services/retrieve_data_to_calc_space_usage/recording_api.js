@@ -1,8 +1,8 @@
 
 const AxiosError = require('axios-error');
 
-module.exports = (RetryEnabledApiStamp, AccessTokensGetterStamp) => {
-  const RecordingApiStamp = RetryEnabledApiStamp.compose(AccessTokensGetterStamp, {
+module.exports = (RetryEnabledApiStamp, accessTokensGetter, recordingApiAccessTokenConfig) => {
+  const RecordingApiStamp = RetryEnabledApiStamp.compose({
     props: {
       baseRecordingsPath: '/recordings',
     },
@@ -10,9 +10,16 @@ module.exports = (RetryEnabledApiStamp, AccessTokensGetterStamp) => {
     methods: {
       async getRecordings(recordingsCallParams) {
         try {
+          const recordingsApiAccessToken = await accessTokensGetter.getAccessToken(recordingApiAccessTokenConfig);
+
           const response = await this.get(
             this.baseRecordingsPath,
-            { params: recordingsCallParams }
+            {
+              params: recordingsCallParams,
+              headers: {
+                authorization: `${recordingsApiAccessToken.token_type} ${recordingsApiAccessToken.access_token}`,
+              },
+            }
           );
 
           return response.data;

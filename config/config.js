@@ -13,11 +13,11 @@ const configForAllEnvExceptDev = {
   },
 
   spaceUsageApi: {
-    baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
+    baseURL: process.env.SPACE_USAGE_API_BASE_URL,
   },
 
   recordingApi: {
-    baseUrl: process.env.RECORDING_API_BASE_URL,
+    baseURL: process.env.RECORDING_API_BASE_URL,
   },
 
   errorLogging: {
@@ -44,11 +44,11 @@ const config = {
     },
 
     spaceUsageApi: {
-      baseUrl: 'http://localhost:3001',
+      baseURL: 'http://localhost:3001',
     },
 
     recordingApi: {
-      baseUrl: 'http://localhost:3000',
+      baseURL: 'http://localhost:3000',
     },
 
     errorLogging: {
