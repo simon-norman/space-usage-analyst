@@ -9,6 +9,7 @@ const RetryEnabledApiStampFactory = require('../services/base_api/retry_enabled_
 const BaseApiStampFactory = require('../services/base_api/base_api');
 const checkIfSuccessfulGraphqlResponseHasNestedError = require('../helpers/graphql_response_error_checker');
 const EventEmittableStamp = require('../services/event_generation/event_emittable_stamp');
+const AccessTokensGetterStampFactory = require('../services/authorization/access_tokens_getter.js');
 const RecordingApiStampFactory = require('../services/retrieve_data_to_calc_space_usage/recording_api');
 const SpaceUsageApiStampFactory = require('../services/space_usage_save/space_usage_api');
 const SpaceApiStampFactory = require('../services/retrieve_data_to_calc_space_usage/space_api.js');
@@ -52,27 +53,34 @@ const setUpDiContainer = () => {
   getFunctionsFromDiContainer();
 };
 
+const registerAccessTokensGetter = () => {
+  const AccessTokensGetterStamp = registerDependencyFromFactory('AccessTokensGetterStamp', AccessTokensGetterStampFactory);
+
+  const accessTokensGetter = AccessTokensGetterStamp();
+  registerDependency('accessTokensGetter', accessTokensGetter);
+};
+
 const registerRecordingApi = () => {
-  const { recordingApiAccessTokenConfig } = config.spaceUsageApi;
+  const { recordingApiAccessTokenConfig } = config.recordingApi;
   registerDependency('recordingApiAccessTokenConfig', recordingApiAccessTokenConfig);
 
   const recordingApiConfig = config.recordingApi;
   const RecordingApiStamp = registerDependencyFromFactory('RecordingApiStamp', RecordingApiStampFactory);
-  const recordingApi = RecordingApiStamp({ apiConfig: recordingApiConfig });
+  const recordingApi = RecordingApiStamp(recordingApiConfig);
   registerDependency('recordingApi', recordingApi);
 };
 
 const registerSpaceUsageApi = () => {
   const spaceUsageApiConfig = config.spaceUsageApi;
   const SpaceUsageApiStamp = registerDependencyFromFactory('SpaceUsageApiStamp', SpaceUsageApiStampFactory);
-  const spaceUsageApi = SpaceUsageApiStamp({ apiConfig: spaceUsageApiConfig });
+  const spaceUsageApi = SpaceUsageApiStamp(spaceUsageApiConfig);
   registerDependency('spaceUsageApi', spaceUsageApi);
 };
 
 const registerSpaceApi = () => {
   const spaceUsageApiConfig = config.spaceUsageApi;
   const SpaceApiStamp = registerDependencyFromFactory('SpaceApiStamp', SpaceApiStampFactory);
-  const spaceApi = SpaceApiStamp({ apiConfig: spaceUsageApiConfig });
+  const spaceApi = SpaceApiStamp(spaceUsageApiConfig);
   registerDependency('spaceApi', spaceApi);
 };
 
@@ -81,6 +89,7 @@ const registerApis = () => {
   registerDependencyFromFactory('BaseApiStamp', BaseApiStampFactory);
   registerDependencyFromFactory('RetryEnabledApiStamp', RetryEnabledApiStampFactory);
 
+  registerAccessTokensGetter();
   registerRecordingApi();
   registerSpaceUsageApi();
   registerSpaceApi();
