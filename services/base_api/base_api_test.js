@@ -10,15 +10,15 @@ describe('base_api', () => {
 
   beforeEach(() => {
     apiConfig = {
-      baseUrl: 'https://baseUrl.com',
+      baseURL: 'https://baseUrl.com',
     };
   });
 
   it('should create api initiliased with the base URL and credentials', async function () {
     BaseApiStamp = BaseApiStampFactory();
-    const baseApi = BaseApiStamp({ apiConfig });
+    const baseApi = BaseApiStamp(apiConfig);
 
-    expect(baseApi.axios.defaults.baseURL).to.equal(apiConfig.baseUrl);
+    expect(baseApi.axios.defaults.baseURL).to.equal(apiConfig.baseURL);
   });
 });
 
