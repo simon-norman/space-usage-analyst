@@ -20,7 +20,7 @@ describe('Space usage calculator', function () {
   let spaceId2ExpectedSpaceUsageToBeCalculated;
 
   const setUpWifiRecordingsSpaceUsageCalculator = () => {
-    const { wireUpCalculateSpaceUsageForTesting } = require('./calculate_space_usage_test_wiring');
+    const { wireUpCalculateSpaceUsageForTesting } = require('./app_wiring_for_all_calc_space_usage_testing');
     diContainer = wireUpCalculateSpaceUsageForTesting();
     wifiRecordingsSpaceUsageCalculator = diContainer.getDependency('wifiRecordingsSpaceUsageCalculator');
   };
