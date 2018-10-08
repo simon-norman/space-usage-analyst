@@ -25,7 +25,7 @@ describe('Getting recordings to calculate space usage,', function () {
   let axiosHttpErrorResponse;
 
   const setUpWifiRecordingsSpaceUsageCalculator = () => {
-    const { wireUpCalculateSpaceUsageForTesting } = require('./calculate_space_usage_test_wiring');
+    const { wireUpCalculateSpaceUsageForTesting } = require('./app_wiring_for_all_calc_space_usage_testing');
     diContainer = wireUpCalculateSpaceUsageForTesting();
     wifiRecordingsSpaceUsageCalculator = diContainer.getDependency('wifiRecordingsSpaceUsageCalculator');
   };

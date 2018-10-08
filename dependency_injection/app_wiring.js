@@ -27,6 +27,7 @@ let registerDependency;
 let registerDependencyFromFactory;
 let registerDependencyFromStampFactory;
 const environment = process.env.NODE_ENV;
+let config;
 
 const getFunctionsFromDiContainer = () => {
   ({
@@ -52,21 +53,24 @@ const setUpDiContainer = () => {
 };
 
 const registerRecordingApi = () => {
-  const recordingApiConfig = getConfigForEnvironment(environment).recordingApi;
+  const { recordingApiAccessTokenConfig } = config.spaceUsageApi;
+  registerDependency('recordingApiAccessTokenConfig', recordingApiAccessTokenConfig);
+
+  const recordingApiConfig = config.recordingApi;
   const RecordingApiStamp = registerDependencyFromFactory('RecordingApiStamp', RecordingApiStampFactory);
   const recordingApi = RecordingApiStamp({ apiConfig: recordingApiConfig });
   registerDependency('recordingApi', recordingApi);
 };
 
 const registerSpaceUsageApi = () => {
-  const spaceUsageApiConfig = getConfigForEnvironment(environment).spaceUsageApi;
+  const spaceUsageApiConfig = config.spaceUsageApi;
   const SpaceUsageApiStamp = registerDependencyFromFactory('SpaceUsageApiStamp', SpaceUsageApiStampFactory);
   const spaceUsageApi = SpaceUsageApiStamp({ apiConfig: spaceUsageApiConfig });
   registerDependency('spaceUsageApi', spaceUsageApi);
 };
 
 const registerSpaceApi = () => {
-  const spaceUsageApiConfig = getConfigForEnvironment(environment).spaceUsageApi;
+  const spaceUsageApiConfig = config.spaceUsageApi;
   const SpaceApiStamp = registerDependencyFromFactory('SpaceApiStamp', SpaceApiStampFactory);
   const spaceApi = SpaceApiStamp({ apiConfig: spaceUsageApiConfig });
   registerDependency('spaceApi', spaceApi);
@@ -82,7 +86,7 @@ const registerApis = () => {
   registerSpaceApi();
 };
 
-const registerRecordingsRetrieval = () => {
+const registerDataToCalcSpaceUsageGetter = () => {
   registerDependencyFromStampFactory(
     'dataToCalcSpaceUsageGetter',
     'DataToCalcSpaceUsageGetterStamp',
@@ -117,10 +121,11 @@ const registerSpaceUsageCalculationScheduling = () => {
 };
 
 const wireUpApp = () => {
+  config = getConfigForEnvironment(environment);
   setUpDiContainer();
 
-  const errorLoggingConfig = getConfigForEnvironment(process.env.NODE_ENV).errorLogging;
-  errorLoggingConfig.environment = process.env.NODE_ENV;
+  const errorLoggingConfig = config.errorLogging;
+  errorLoggingConfig.environment = environment;
   const { logException } = RavenWrapperFactory(errorLoggingConfig);
 
   registerDependency('logException', logException);
@@ -128,7 +133,7 @@ const wireUpApp = () => {
   registerApis();
 
   registerDependency('EventEmittableStamp', EventEmittableStamp);
-  registerRecordingsRetrieval();
+  registerDataToCalcSpaceUsageGetter();
   registerSpaceUsageCalculation();
   registerSpaceUsageCalculationScheduling();
 

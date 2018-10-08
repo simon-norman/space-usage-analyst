@@ -14,6 +14,15 @@ const configForAllEnvExceptDev = {
 
   spaceUsageApi: {
     baseURL: process.env.SPACE_USAGE_API_BASE_URL,
+    recordingApiAccessTokenConfig: {
+      accessTokenApiUrl: 'https://recordings.eu.auth0.com/oauth/token',
+      credentialsToGetAccessToken: {
+        grant_type: 'client_credentials',
+        client_id: 'RLZ307GIruy1BWkURusz3xt0eL9EAAC8',
+        client_secret: process.env.AUTH0_CLIENT_SECRET,
+        audience: 'https://api-recording.herokuapp.com/',
+      },
+    },
   },
 
   recordingApi: {
@@ -49,6 +58,15 @@ const config = {
 
     recordingApi: {
       baseURL: 'http://localhost:3000',
+      recordingApiAccessTokenConfig: {
+        accessTokenApiUrl: 'https://recordings.eu.auth0.com/oauth/token',
+        credentialsToGetAccessToken: {
+          grant_type: 'client_credentials',
+          client_id: 'vGPfQaQpZbLHT276e6366PRutBiWx9IF',
+          client_secret: process.env.AUTH0_CLIENT_SECRET,
+          audience: 'https://api-recording.herokuapp.com/',
+        },
+      },
     },
 
     errorLogging: {
