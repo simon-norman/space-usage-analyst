@@ -14,6 +14,10 @@ const configForAllEnvExceptDev = {
 
   spaceUsageApi: {
     baseURL: process.env.SPACE_USAGE_API_BASE_URL,
+  },
+
+  recordingApi: {
+    baseURL: process.env.RECORDING_API_BASE_URL,
     recordingApiAccessTokenConfig: {
       accessTokenApiUrl: 'https://recordings.eu.auth0.com/oauth/token',
       credentialsToGetAccessToken: {
@@ -23,10 +27,6 @@ const configForAllEnvExceptDev = {
         audience: 'https://api-recording.herokuapp.com/',
       },
     },
-  },
-
-  recordingApi: {
-    baseURL: process.env.RECORDING_API_BASE_URL,
   },
 
   errorLogging: {
