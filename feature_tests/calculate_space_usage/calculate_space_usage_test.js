@@ -102,7 +102,7 @@ describe('Space usage calculator', function () {
     });
 
     context('but space usage api is NOT available to save space usage,', function () {
-      it.only('should throw the error', async function () {
+      it('should throw the error', async function () {
         const postSpaceUsageError = new Error('an error');
         postSpaceUsageStub.onFirstCall().throws(postSpaceUsageError);
 
