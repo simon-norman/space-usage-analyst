@@ -178,5 +178,20 @@ describe('Getting recordings to calculate space usage,', function () {
         expect(logExceptionSpy.firstCall.args[0].message).equals('No recordings found');
       });
     });
+
+    context('that doesn`t have error.response', function () {
+      it('should throw the error', async function () {
+        const errorWithoutResponseAsKey = new Error('an error');
+        getRecordingsStub.onFirstCall().throws(errorWithoutResponseAsKey);
+
+        process.once('unhandledRejection', (error) => {
+          expect(error.message).equals(errorWithoutResponseAsKey.message);
+        });
+
+        wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+        await setPromisifiedTimeout(1);
+      });
+    });
   });
 });

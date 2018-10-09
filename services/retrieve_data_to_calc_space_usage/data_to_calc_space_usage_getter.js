@@ -81,7 +81,7 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
       },
 
       handleGetRecordingsForSingleSpaceError(error, resolve, reject) {
-        if (error.response.status === 404) {
+        if (error.response && error.response.status === 404) {
           this.logException(error);
           resolve();
         } else {

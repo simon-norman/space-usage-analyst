@@ -21,21 +21,6 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "Logger tests",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*logger_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
         "name": "DI container tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
@@ -60,66 +45,6 @@
             "999999",
             "--colors",
             "./{,!(node_modules)/**/}*di_container_incl_stamps_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
-        "name": "App wiring tests",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*app_wiring_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
-        "name": "space usage analysis scheduler",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*space_usage_analysis_scheduler_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
-        "name": "all recordings by timeframe getter test",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*all_recordings_by_timeframe_getter_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
-        "name": "wifi recordings deduplicator",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*wifi_recordings_deduplicator_test.js"
         ],
         "internalConsoleOptions": "openOnSessionStart"
     },
@@ -156,36 +81,6 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "recording api tests",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*recording_api_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
-        "name": "api space usage tests",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*space_api_test.1.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
         "name": "space usage api tests",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
@@ -195,21 +90,6 @@
             "999999",
             "--colors",
             "./{,!(node_modules)/**/}*space_usage_api_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
-        "name": "space api tests",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*space_api_test.js"
         ],
         "internalConsoleOptions": "openOnSessionStart"
     },
@@ -261,36 +141,6 @@
     {
         "type": "node",
         "request": "launch",
-        "name": "Space usage model tests",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*space_usage_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
-        "name": "Space model tests",
-        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-        "args": [
-            "-u",
-            "tdd",
-            "--timeout",
-            "999999",
-            "--colors",
-            "./{,!(node_modules)/**/}*space_test.js"
-        ],
-        "internalConsoleOptions": "openOnSessionStart"
-    },
-    {
-        "type": "node",
-        "request": "launch",
         "name": "Calculate space usage",
         "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
         "args": [
@@ -300,6 +150,36 @@
             "999999",
             "--colors",
             "./{,!(node_modules)/**/}*calculate_space_usage_test.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
+        "name": "Get recordings to calc space usage test",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*get_recordings_to_calc_space_usage_test.js"
+        ],
+        "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+        "type": "node",
+        "request": "launch",
+        "name": "Get spaces to calc space usage test",
+        "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+        "args": [
+            "-u",
+            "tdd",
+            "--timeout",
+            "999999",
+            "--colors",
+            "./{,!(node_modules)/**/}*get_spaces_to_calc_space_usage_test.js"
         ],
         "internalConsoleOptions": "openOnSessionStart"
     },
