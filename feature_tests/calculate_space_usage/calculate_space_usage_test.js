@@ -100,20 +100,20 @@ describe('Space usage calculator', function () {
           .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
       });
     });
+  });
 
-    context('but space usage api is NOT available to save space usage,', function () {
-      it('should throw the error', async function () {
-        const postSpaceUsageError = new Error('an error');
-        postSpaceUsageStub.onFirstCall().throws(postSpaceUsageError);
+  context('but space usage api returns error when saving space usage,', function () {
+    it('should throw the error', async function () {
+      const postSpaceUsageError = new Error('an error');
+      postSpaceUsageStub.onFirstCall().throws(postSpaceUsageError);
 
-        process.once('unhandledRejection', (error) => {
-          expect(error.message).equals(postSpaceUsageError.message);
-        });
-
-        wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
-
-        await setPromisifiedTimeout(1);
+      process.once('unhandledRejection', (error) => {
+        expect(error.message).equals(postSpaceUsageError.message);
       });
+
+      wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+      await setPromisifiedTimeout(1);
     });
   });
 });
