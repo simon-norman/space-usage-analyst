@@ -8,7 +8,11 @@ const setUpGetAccessTokenForRecordingsApi = (diContainer) => {
   getAccessTokenStub = setUpMockGetAccessToken(diContainer);
 
   const recordingApiAccessTokenConfig = diContainer.getDependency('recordingApiAccessTokenConfig');
-  mockAccessTokenForRecordingsApi = { token_type: 'some_token_type', access_token: 'some token data' };
+  mockAccessTokenForRecordingsApi = {
+    data: {
+      token_type: 'some_token_type', access_token: 'some token data',
+    },
+  };
 
   getAccessTokenStub.withArgs(
     recordingApiAccessTokenConfig.accessTokenApiUrl,

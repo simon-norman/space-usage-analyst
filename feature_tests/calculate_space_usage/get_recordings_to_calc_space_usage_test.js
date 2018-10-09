@@ -109,7 +109,7 @@ describe('Getting recordings to calculate space usage,', function () {
       expect(getRecordingsStub.secondCall.args[0]).equals('/recordings');
 
       const expectedAccessTokenHeader = {
-        authorization: `${mockAccessTokenForRecordingsApi.token_type} ${mockAccessTokenForRecordingsApi.access_token}`,
+        authorization: `${mockAccessTokenForRecordingsApi.data.token_type} ${mockAccessTokenForRecordingsApi.data.access_token}`,
       };
       expect(getRecordingsStub.firstCall.args[1].headers).deep.equals(expectedAccessTokenHeader);
       expect(getRecordingsStub.secondCall.args[1].headers).deep.equals(expectedAccessTokenHeader);

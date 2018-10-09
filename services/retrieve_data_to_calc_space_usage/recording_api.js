@@ -17,7 +17,7 @@ module.exports = (RetryEnabledApiStamp, accessTokensGetter, recordingApiAccessTo
             {
               params: recordingsCallParams,
               headers: {
-                authorization: `${recordingsApiAccessToken.token_type} ${recordingsApiAccessToken.access_token}`,
+                authorization: `${recordingsApiAccessToken.data.token_type} ${recordingsApiAccessToken.data.access_token}`,
               },
             }
           );

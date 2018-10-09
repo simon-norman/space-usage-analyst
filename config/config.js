@@ -53,7 +53,7 @@ const config = {
     },
 
     spaceUsageApi: {
-      baseURL: 'http://localhost:3001',
+      baseURL: 'http://localhost:4000',
     },
 
     recordingApi: {
