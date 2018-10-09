@@ -23,7 +23,7 @@ const configForAllEnvExceptDev = {
       credentialsToGetAccessToken: {
         grant_type: 'client_credentials',
         client_id: 'RLZ307GIruy1BWkURusz3xt0eL9EAAC8',
-        client_secret: process.env.AUTH0_CLIENT_SECRET,
+        client_secret: process.env.SPACE_USAGE_ANALYST_AUTH0_CLIENT_SECRET,
         audience: 'https://api-recording.herokuapp.com/',
       },
     },
@@ -63,7 +63,7 @@ const config = {
         credentialsToGetAccessToken: {
           grant_type: 'client_credentials',
           client_id: 'vGPfQaQpZbLHT276e6366PRutBiWx9IF',
-          client_secret: process.env.AUTH0_CLIENT_SECRET,
+          client_secret: process.env.SPACE_USAGE_ANALYST_AUTH0_CLIENT_SECRET,
           audience: 'https://api-recording.herokuapp.com/',
         },
       },
