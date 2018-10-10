@@ -13,10 +13,7 @@ const { expect } = chai;
 describe('Getting recordings to calculate space usage,', function () {
   let mockSpaces;
   let mockAccessTokenForRecordingsApi;
-  let mockRecordings;
   let getRecordingsStub;
-  let postSpaceUsageStub;
-  let logExceptionSpy;
   let diContainer;
   let wifiRecordingsSpaceUsageCalculator;
   let calculateSpaceUsageParams;
@@ -30,18 +27,12 @@ describe('Getting recordings to calculate space usage,', function () {
     wifiRecordingsSpaceUsageCalculator = diContainer.getDependency('wifiRecordingsSpaceUsageCalculator');
   };
 
-  const getLogExceptionSpy = () => {
-    logExceptionSpy = diContainer.getDependency('logException');
-  };
-
   const setUpMockedExternalFunctions = () => {
     ({ mockSpaces } = setUpMockGetSpacesApiCall(diContainer));
 
-    ({ mockRecordings, getRecordingsStub, mockAccessTokenForRecordingsApi } = setUpMockGetRecordingsApiCall(diContainer));
+    ({ getRecordingsStub, mockAccessTokenForRecordingsApi } = setUpMockGetRecordingsApiCall(diContainer));
 
-    ({ postSpaceUsageStub } = setUpMockSaveSpaceUsageApiCall(diContainer));
-
-    getLogExceptionSpy();
+    setUpMockSaveSpaceUsageApiCall(diContainer);
   };
 
   const setUpParamsForSpaceUsageCalculation = () => {
@@ -157,25 +148,6 @@ describe('Getting recordings to calculate space usage,', function () {
         wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
         await setPromisifiedTimeout(1);
-      });
-    });
-
-    context('that has a 404 status', function () {
-      it('should log exception without blowing up app, and move onto getting recordings for the next space', async function () {
-        axiosHttpErrorResponse.response.data.error.message = 'No recordings found';
-        axiosHttpErrorResponse.response.status = 404;
-        getRecordingsStub.onFirstCall().throws(axiosHttpErrorResponse);
-        getRecordingsStub.onSecondCall().returns({ status: 200, data: mockRecordings });
-
-        wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
-
-        await setPromisifiedTimeout(1);
-
-        const firstSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.firstCall.args[1];
-        expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
-          .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
-
-        expect(logExceptionSpy.firstCall.args[0].message).equals('No recordings found');
       });
     });
 

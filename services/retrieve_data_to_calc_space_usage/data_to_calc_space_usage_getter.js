@@ -58,18 +58,18 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         return allPromisesToGetThenEmitRecordings;
       },
 
-      getPromiseToGetRecordingsThenEmitAllCalcData(paramsToGetRecordings, occupancyCapacity) {
-        return new Promise(async (resolve, reject) => {
-          let recordings;
+      async getPromiseToGetRecordingsThenEmitAllCalcData(paramsToGetRecordings, occupancyCapacity) {
+        let recordings = [];
 
-          try {
-            recordings = await this.recordingApi.getRecordings(paramsToGetRecordings);
-            this.emitAllCalcData(recordings, paramsToGetRecordings, occupancyCapacity);
-            resolve();
-          } catch (error) {
-            this.handleGetRecordingsForSingleSpaceError(error, resolve, reject);
+        try {
+          recordings = await this.recordingApi.getRecordings(paramsToGetRecordings);
+        } catch (error) {
+          if (!error.response || error.response.status !== 404) {
+            throw error;
           }
-        });
+        }
+
+        this.emitAllCalcData(recordings, paramsToGetRecordings, occupancyCapacity);
       },
 
       emitAllCalcData(recordings, paramsToGetRecordings, occupancyCapacity) {
@@ -78,15 +78,6 @@ module.exports = (EventEmittableStamp, spaceApi, recordingApi, logException) => 
         recordingsBySpaceIdAndTimeframe.recordings = recordings;
 
         this.emit('recordings-by-space-timeframe', recordingsBySpaceIdAndTimeframe);
-      },
-
-      handleGetRecordingsForSingleSpaceError(error, resolve, reject) {
-        if (error.response && error.response.status === 404) {
-          this.logException(error);
-          resolve();
-        } else {
-          reject(error);
-        }
       },
 
       handleGetAllRecordingsError(error) {
