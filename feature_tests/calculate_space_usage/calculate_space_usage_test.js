@@ -149,7 +149,6 @@ describe('Space usage calculator', function () {
     });
 
     it('should calculate a space usage with an occupancy of 0', async function () {
-      axiosHttpErrorResponse.response.data.error.message = 'No recordings found';
       axiosHttpErrorResponse.response.status = 404;
       getRecordingsStub.throws(axiosHttpErrorResponse);
 
