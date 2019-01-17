@@ -1,3 +1,44 @@
+/* eslint prefer-spread: "off"  */
+
+const configForAllEnvExceptDev = {
+  webServer: {
+    port: process.env.PORT,
+  },
+
+  scheduleUsageAnalysis: {
+    usageAnalysisPeriod: 900000,
+    secondsOfMinute: 0,
+    minutesOfHour: [0, 15, 30, 45],
+    avgIntervalPeriodThatDeviceDetected: 900000,
+  },
+
+  spaceUsageApi: {
+    baseURL: process.env.SPACE_USAGE_API_BASE_URL,
+  },
+
+  recordingApi: {
+    baseURL: process.env.RECORDING_API_BASE_URL,
+    recordingApiAccessTokenConfig: {
+      accessTokenApiUrl: 'https://recordings.eu.auth0.com/oauth/token',
+      credentialsToGetAccessToken: {
+        grant_type: 'client_credentials',
+        client_id: 'vGPfQaQpZbLHT276e6366PRutBiWx9IF',
+        client_secret: process.env.SPACE_USAGE_ANALYST_AUTH0_CLIENT_SECRET,
+        audience: 'https://api-recording.herokuapp.com/',
+      },
+    },
+  },
+
+  errorLogging: {
+    environment: '',
+    ravenConfig: {
+      dsn: process.env.RAVEN_DSN,
+      options: {
+        captureUnhandledRejections: true,
+      },
+    },
+  },
+};
 
 const config = {
   development: {
@@ -7,61 +48,43 @@ const config = {
 
     scheduleUsageAnalysis: {
       usageAnalysisPeriod: 900000,
-      secondsOfMinute: Array.apply(null, {length: 60}).map(Number.call, Number),
+      secondsOfMinute: Array.apply(null, { length: 60 }).map(Number.call, Number),
+      avgIntervalPeriodThatDeviceDetected: 900000,
     },
 
     spaceUsageApi: {
-      baseUrl: 'localhost:3000',
+      baseURL: 'http://localhost:4000',
     },
+
     recordingApi: {
-      baseUrl: 'localhost:3001',
+      baseURL: 'http://localhost:3000',
+      recordingApiAccessTokenConfig: {
+        accessTokenApiUrl: 'https://recordings.eu.auth0.com/oauth/token',
+        credentialsToGetAccessToken: {
+          grant_type: 'client_credentials',
+          client_id: 'vGPfQaQpZbLHT276e6366PRutBiWx9IF',
+          client_secret: process.env.SPACE_USAGE_ANALYST_AUTH0_CLIENT_SECRET,
+          audience: 'https://api-recording.herokuapp.com/',
+        },
+      },
+    },
+
+    errorLogging: {
+      environment: '',
+      ravenConfig: {
+        dsn: process.env.RAVEN_DSN,
+        options: {
+          captureUnhandledRejections: true,
+        },
+      },
     },
   },
 
-  test: {
-    scheduleUsageAnalysis: {
-      usageAnalysisPeriod: 900000,
-      secondsOfMinute: 0,
-      minutesOfHour: [0, 15, 30, 45],
-    },
+  test: configForAllEnvExceptDev,
 
-    spaceUsageApi: {
-      baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
-    },
-    recordingApi: {
-      baseUrl: process.env.RECORDING_API_BASE_URL,
-    },
-  },
+  qa: configForAllEnvExceptDev,
 
-  qa: {
-    scheduleUsageAnalysis: {
-      usageAnalysisPeriod: 900000,
-      secondsOfMinute: 0,
-      minutesOfHour: [0, 15, 30, 45],
-    },
-
-    spaceUsageApi: {
-      baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
-    },
-    recordingApi: {
-      baseUrl: process.env.RECORDING_API_BASE_URL,
-    },
-  },
-
-  production: {
-    scheduleUsageAnalysis: {
-      usageAnalysisPeriod: 900000,
-      secondsOfMinute: 0,
-      minutesOfHour: [0, 15, 30, 45],
-    },
-
-    spaceUsageApi: {
-      baseUrl: process.env.SPACE_USAGE_API_BASE_URL,
-    },
-    recordingApi: {
-      baseUrl: process.env.RECORDING_API_BASE_URL,
-    },
-  },
+  production: configForAllEnvExceptDev,
 };
 
 const getConfigForEnvironment = (environment) => {

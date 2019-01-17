@@ -1,26 +1,48 @@
 const stampit = require('stampit');
 
-const checkStampFactoryArgumentsValid = (RetryEnabledApiStamp) => {
-  if (!RetryEnabledApiStamp) {
-    throw new Error('Retry Enabled Stamp not provided to Api stamp factory');
-  }
-};
-
-module.exports = (RetryEnabledApiStamp) => {
-  checkStampFactoryArgumentsValid(RetryEnabledApiStamp);
+module.exports = (RetryEnabledApiStamp, checkIfSuccessfulGraphqlResponseHasNestedError) => {
   const RecordingApiStamp = stampit({
     props: {
-      baseSpaceUsagePath: '/spaceUsage/',
+      checkIfSuccessfulGraphqlResponseHasNestedError,
+
+      baseSpaceUsagePath: '/',
+
+      saveSpaceUsageQueryString: `mutation CreateSpaceUsage($input: SpaceUsageInput) {
+        CreateSpaceUsage(input: $input) {
+        _id
+        spaceId
+        usagePeriodStartTime
+        usagePeriodEndTime
+        numberOfPeopleRecorded
+        }
+      }`,
     },
 
     methods: {
       saveSpaceUsage(spaceUsage) {
+        return new Promise(async (resolve, reject) => {
+          try {
+            const response = await this.makeSaveSpaceUsageCall(spaceUsage);
+            this.checkIfSuccessfulGraphqlResponseHasNestedError(response);
+
+            resolve(response.data.data.CreateSpaceUsage);
+          } catch (error) {
+            reject(error);
+          }
+        });
+      },
+
+      makeSaveSpaceUsageCall(spaceUsage) {
         return this.post(
           this.baseSpaceUsagePath,
-          spaceUsage,
+          {
+            query: this.saveSpaceUsageQueryString,
+            variables: { input: spaceUsage },
+          },
         );
       },
     },
   });
+
   return RecordingApiStamp.compose(RetryEnabledApiStamp);
 };

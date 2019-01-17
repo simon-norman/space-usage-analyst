@@ -32,6 +32,7 @@ module.exports = () => stampit({
     checkSnapshotsPeriodDividesExactlyBySnapshotLength(stampInitArguments) {
       const usagePeriod =
         stampInitArguments.usagePeriodEndTime - stampInitArguments.usagePeriodStartTime;
+
       if (!Number.isInteger(usagePeriod / stampInitArguments.snapshotLengthInMilliseconds)) {
         throw new Error('Snapshots period did not divide exactly by the snapshot length');
       }
@@ -58,10 +59,11 @@ module.exports = () => stampit({
     },
 
     calculateSnapshotTimeOfRecording(recording) {
-      const diffBetweenRecordingTimeUsagePeriodStartTime
-        = recording.timestampRecorded - this.usagePeriodStartTime;
+      const recordingTimestampAsUnixEpoch = new Date(recording.timestampRecorded).getTime();
+      const diffBetwTimestampAndUsagePeriodStartTime
+        = recordingTimestampAsUnixEpoch - this.usagePeriodStartTime;
 
-      const indexOfSnapshot = Math.floor(diffBetweenRecordingTimeUsagePeriodStartTime /
+      const indexOfSnapshot = Math.floor(diffBetwTimestampAndUsagePeriodStartTime /
         this.snapshotLengthInMilliseconds);
 
       return this.usagePeriodStartTime + (indexOfSnapshot * this.snapshotLengthInMilliseconds);
@@ -72,10 +74,11 @@ module.exports = () => stampit({
         this.addRecordingToCalculation(recording);
       }
 
-      const arrayOfRecordingCountsForPeriod
-        = Array.from(this.mapOfSnapshotTimesToRecordingsCount.values());
+      const recordingCountsForPeriod = this.mapOfSnapshotTimesToRecordingsCount.values();
+      const arrayOfRecordingCountsForPeriod = Array.from(recordingCountsForPeriod);
 
-      return math.ceil(math.median(arrayOfRecordingCountsForPeriod));
+      const medianNoOfPeopleInPeriod = math.median(arrayOfRecordingCountsForPeriod);
+      return math.ceil(medianNoOfPeopleInPeriod);
     },
   },
 });

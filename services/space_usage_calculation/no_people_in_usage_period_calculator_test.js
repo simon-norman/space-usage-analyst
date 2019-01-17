@@ -22,11 +22,21 @@ describe('no_people_in_usage_period_calculator', function () {
   const setUpMockRecordings = () => {
     mockRecordings =
     [{
-      timestampRecorded: new Date('December 1, 2018 12:00:03').getTime(),
+      timestampRecorded: 'December 1, 2018 12:00:00',
     },
     {
-      timestampRecorded: new Date('December 1, 2018 12:00:06').getTime(),
-    }];
+      timestampRecorded: 'December 1, 2018 12:00:00',
+    },
+    {
+      timestampRecorded: 'December 1, 2018 12:00:03',
+    },
+    {
+      timestampRecorded: 'December 1, 2018 12:00:06',
+    },
+    {
+      timestampRecorded: 'December 1, 2018 12:00:99',
+    }
+    ];
   };
 
   const checkNoPeopleInUsagePeriodCalculatorStampThrows = () => {
@@ -50,7 +60,7 @@ describe('no_people_in_usage_period_calculator', function () {
     const noOfPeopleInUsagePeriod = noPeopleInUsagePeriodCalculator
       .calculateNoOfPeopleInUsagePeriod(mockRecordings);
 
-    expect(noOfPeopleInUsagePeriod).to.equal(1);
+    expect(noOfPeopleInUsagePeriod).to.equal(3);
   });
 
   it('should throw exception if instantiated with a usage period that does not divide exactly by the snapshot time', function () {
