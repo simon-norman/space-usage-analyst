@@ -12,7 +12,7 @@ The service is written in Node, running on an Express server.
 
 The app is wired up using a dependency injection container that automatically reads each module's dependencies and then initialises the module with those dependencies. The container then stores that module so that it can be passed to other modules that depend on it. 
 
-BDD tests are written using Chai and run in Mocha, using Supertest to call endpoints.
+BDD tests are written using Chai and run in Mocha.
 
 The service is secured using OAUTH 3rd party service. 
 
