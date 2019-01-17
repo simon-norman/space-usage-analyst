@@ -1,4 +1,4 @@
-/* eslint prefer-spread: "off" */
+/* eslint prefer-spread: "off"  */
 
 const configForAllEnvExceptDev = {
   webServer: {
