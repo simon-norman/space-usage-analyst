@@ -4,7 +4,7 @@
 
 This is part of the Workplace Intelligence Platform, which provides organisations with real-time insights on how their staff are using their workspaces, in order to inform how the space can be improved and property costs can be reduced. 
 
-This service sifts through the raw recording data (the mobile device location data) and identifies how many people have occupied each space throughout the day. 
+This service calls the Recordings API every 15 minutes and retrieves the raw recording data (the mobile device location data). It then sifts through the data to identifies how many people have occupied each space throughout the day. It saves this analysis to the Space Usage API. 
 
 ## Technical overview
 
