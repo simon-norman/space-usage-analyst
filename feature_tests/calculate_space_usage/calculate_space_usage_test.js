@@ -65,8 +65,8 @@ describe('Space usage calculator', function () {
     setUpExpectedSpaceUsagesToBeCalculated();
   });
 
-  context('given recording and spaces to calculate usage are available from apis,', function () {
-    context('and that space usage api is available to save space usage,', function () {
+  context('given that recording and spaces data to calculate usage are available from apis,', function () {
+    context('and given that space usage api is available to save space usage,', function () {
       context('when calculate space usage is called ONCE with a specified timeframe', function () {
         it('then should calculate and save, for that timeframe, the space usage for each area', async function () {
           wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
@@ -82,11 +82,75 @@ describe('Space usage calculator', function () {
             .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
         });
       });
+
+      context('when calculate space usage is called TWICE in quick succession', function () {
+        it('should not duplicate space usage calculations (duplicates could be caused by space usage calculator adding duplicate listeners)', async function () {
+          wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+          wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+          await setPromisifiedTimeout(1);
+
+          const firstSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.firstCall.args[1];
+          expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
+            .deep.equals(spaceId1ExpectedSpaceUsageToBeCalculated);
+          expect(postSpaceUsageStub).to.have.callCount(4);
+
+          const secondSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.secondCall.args[1];
+          expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
+            .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
+        });
+      });
     });
 
-    context('when calculate space usage is called TWICE in quick succession', function () {
-      it('should not duplicate space usage calculations (duplicates could be caused by space usage calculator adding duplicate listeners)', async function () {
+    context('but given that space usage api returns error when saving space usage,', function () {
+      it('should throw the error', async function () {
+        const postSpaceUsageError = new Error('an error');
+        postSpaceUsageStub.onFirstCall().throws(postSpaceUsageError);
+
+        process.once('unhandledRejection', (error) => {
+          expect(error.message).equals(postSpaceUsageError.message);
+        });
+
         wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
+
+        await setPromisifiedTimeout(1);
+      });
+    });
+
+    context('but given that recordings api returns no recordings for a given space,', function () {
+      let axiosHttpErrorResponse;
+
+      const setUpHttpErrorResponse = () => {
+        axiosHttpErrorResponse = {
+          response: {
+            status: '',
+            data: {
+              error: {
+                message: '',
+              },
+            },
+          },
+        };
+      };
+
+      const setExpectedSpaceUsagesToBeCalculatedWithZeroOccupancy = () => {
+        spaceId1ExpectedSpaceUsageToBeCalculated.numberOfPeopleRecorded = 0;
+        spaceId1ExpectedSpaceUsageToBeCalculated.occupancy = 0;
+
+        spaceId2ExpectedSpaceUsageToBeCalculated = Object.assign({}, spaceId1ExpectedSpaceUsageToBeCalculated);
+        spaceId2ExpectedSpaceUsageToBeCalculated.spaceId = mockSpaces[1]._id;
+      };
+
+      beforeEach(() => {
+        setUpHttpErrorResponse();
+
+        setExpectedSpaceUsagesToBeCalculatedWithZeroOccupancy();
+      });
+
+      it('should calculate a space usage with an occupancy of 0', async function () {
+        axiosHttpErrorResponse.response.status = 404;
+        getRecordingsStub.throws(axiosHttpErrorResponse);
+
         wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
         await setPromisifiedTimeout(1);
@@ -94,75 +158,11 @@ describe('Space usage calculator', function () {
         const firstSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.firstCall.args[1];
         expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
           .deep.equals(spaceId1ExpectedSpaceUsageToBeCalculated);
-        expect(postSpaceUsageStub).to.have.callCount(4);
 
         const secondSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.secondCall.args[1];
         expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
           .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
       });
-    });
-  });
-
-  context('but space usage api returns error when saving space usage,', function () {
-    it('should throw the error', async function () {
-      const postSpaceUsageError = new Error('an error');
-      postSpaceUsageStub.onFirstCall().throws(postSpaceUsageError);
-
-      process.once('unhandledRejection', (error) => {
-        expect(error.message).equals(postSpaceUsageError.message);
-      });
-
-      wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
-
-      await setPromisifiedTimeout(1);
-    });
-  });
-
-  context('given that recordings api returns no recordings for a given space,', function () {
-    let axiosHttpErrorResponse;
-
-    const setUpHttpErrorResponse = () => {
-      axiosHttpErrorResponse = {
-        response: {
-          status: '',
-          data: {
-            error: {
-              message: '',
-            },
-          },
-        },
-      };
-    };
-
-    const setExpectedSpaceUsagesToBeCalculatedWithZeroOccupancy = () => {
-      spaceId1ExpectedSpaceUsageToBeCalculated.numberOfPeopleRecorded = 0;
-      spaceId1ExpectedSpaceUsageToBeCalculated.occupancy = 0;
-
-      spaceId2ExpectedSpaceUsageToBeCalculated = Object.assign({}, spaceId1ExpectedSpaceUsageToBeCalculated);
-      spaceId2ExpectedSpaceUsageToBeCalculated.spaceId = mockSpaces[1]._id;
-    };
-
-    beforeEach(() => {
-      setUpHttpErrorResponse();
-
-      setExpectedSpaceUsagesToBeCalculatedWithZeroOccupancy();
-    });
-
-    it('should calculate a space usage with an occupancy of 0', async function () {
-      axiosHttpErrorResponse.response.status = 404;
-      getRecordingsStub.throws(axiosHttpErrorResponse);
-
-      wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
-
-      await setPromisifiedTimeout(1);
-
-      const firstSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.firstCall.args[1];
-      expect(firstSpaceUsagePostedToMockSpaceUsageApi.variables.input)
-        .deep.equals(spaceId1ExpectedSpaceUsageToBeCalculated);
-
-      const secondSpaceUsagePostedToMockSpaceUsageApi = postSpaceUsageStub.secondCall.args[1];
-      expect(secondSpaceUsagePostedToMockSpaceUsageApi.variables.input)
-        .deep.equals(spaceId2ExpectedSpaceUsageToBeCalculated);
     });
   });
 });

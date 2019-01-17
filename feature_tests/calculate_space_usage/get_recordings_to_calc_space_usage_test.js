@@ -90,7 +90,7 @@ describe('Getting recordings to calculate space usage,', function () {
     expect(getRecordingsStub).calledTwice;
   });
 
-  context('and for all recordings api calls,', function () {
+  context('for each recordings api call,', function () {
     it('should specify the same endpoint, api access token, and start time and end time', async function () {
       wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
@@ -114,7 +114,7 @@ describe('Getting recordings to calculate space usage,', function () {
     });
   });
 
-  context('but for the first recordings api call,', function () {
+  context('for the first recordings api call,', function () {
     it('should specify the space ID of the first space retrieved', async function () {
       wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
@@ -124,7 +124,7 @@ describe('Getting recordings to calculate space usage,', function () {
     });
   });
 
-  context('and for the second recordings api call,', function () {
+  context('for the second recordings api call,', function () {
     it('should specify the space ID of the second space retrieved', async function () {
       wifiRecordingsSpaceUsageCalculator.calculateSpaceUsage(calculateSpaceUsageParams);
 
@@ -134,7 +134,7 @@ describe('Getting recordings to calculate space usage,', function () {
     });
   });
 
-  context('and get recordings call throws an error (after any retry attempts have been made by axios-retry)', function () {
+  context('when the get recordings call throws an error (after any retry attempts have been made by axios-retry)', function () {
     context('that doesn`t have a 404 status', function () {
       it('should throw error', async function () {
         axiosHttpErrorResponse.response.data.error.message = 'bad request error';
